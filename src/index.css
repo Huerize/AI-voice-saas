@@ -50,4 +50,30 @@
   .text-glow {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
   }
+
+  /* Navigation hover effects */
+  nav a {
+    @apply relative py-1;
+  }
+
+  nav a::after {
+    @apply content-[''] absolute left-0 bottom-0 w-0 h-0.5 bg-white transition-all duration-300 ease-in-out;
+  }
+
+  nav a:hover::after {
+    @apply w-full;
+  }
+
+  /* Button hover effects */
+  .button-glow {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .button-glow::before {
+    @apply content-[''] absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 transition-opacity duration-300;
+  }
+
+  .button-glow:hover::before {
+    @apply opacity-100;
+  }
 }

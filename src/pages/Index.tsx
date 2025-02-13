@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +39,14 @@ const Index = () => {
               <a href="#careers" className="text-gray-300 hover:text-white transition-colors">Careers</a>
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" className="text-gray-300 hover:text-white">
+                Log in
+              </Button>
+              <Button className="bg-white text-black hover:bg-white/90">
+                Try for free
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -107,7 +114,7 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent h-40 -bottom-1 z-10" />
             <div className="glass-card rounded-xl overflow-hidden">
               <img 
-                src="/lovable-uploads/c3894d12-d7e6-4113-b1f0-b18e6d53eb39.png"
+                src="/lovable-uploads/a42367f7-3454-4c70-8058-2287bfe916a0.png"
                 alt="Dashboard Preview"
                 className="w-full rounded-lg shadow-2xl"
               />
