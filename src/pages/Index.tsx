@@ -1,167 +1,103 @@
 
 import { motion } from "framer-motion";
-import { ArrowRight, Cpu, Zap, MessageSquare, GitCompare, Briefcase } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const FeatureCard = ({ icon: Icon, title, description }: { icon: any; title: string; description: string }) => (
-  <Card className="p-6 hover:shadow-lg transition-all duration-300 border border-gray-100">
-    <div className="flex items-start space-x-4">
-      <div className="p-2 bg-purple-50 rounded-lg">
-        <Icon className="w-6 h-6 text-purple-600" />
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
-        <p className="text-gray-600 leading-relaxed">{description}</p>
-      </div>
-    </div>
-  </Card>
-);
-
-const ComparisonFeature = ({ feature, isAvailable }: { feature: string; isAvailable: boolean }) => (
-  <div className="flex items-center space-x-2 py-2">
-    <div className={`w-4 h-4 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-gray-200'}`} />
-    <span className="text-sm text-gray-700">{feature}</span>
-  </div>
-);
 
 const Index = () => {
-  const fadeIn = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="px-4 py-1.5 rounded-full bg-purple-50 text-purple-700 text-sm font-medium inline-block mb-4">
-            Revolutionizing Voice AI
-          </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            AI-Powered Voice Automation
-            <br />
-            <span className="text-purple-600">for Modern Businesses</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Transform your business communication with hyper-realistic AI voice agents and powerful workflow automation.
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-              Get Started <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-            <Button size="lg" variant="outline">
-              Watch Demo
-            </Button>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <motion.div 
-          className="text-center mb-16"
-          {...fadeIn}
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Powerful Features for Your Business
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Everything you need to automate customer interactions and streamline your workflows.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <motion.div {...fadeIn} transition={{ delay: 0.2 }}>
-            <FeatureCard
-              icon={Cpu}
-              title="AI Voice Agents"
-              description="Hyper-realistic AI voices powered by advanced technology for natural conversations."
-            />
-          </motion.div>
-          <motion.div {...fadeIn} transition={{ delay: 0.3 }}>
-            <FeatureCard
-              icon={Zap}
-              title="Workflow Automation"
-              description="Build powerful automation workflows with our intuitive drag-and-drop builder."
-            />
-          </motion.div>
-          <motion.div {...fadeIn} transition={{ delay: 0.4 }}>
-            <FeatureCard
-              icon={MessageSquare}
-              title="Multilingual Support"
-              description="Communicate with customers in multiple languages including English, Arabic, and Hindi."
-            />
-          </motion.div>
-          <motion.div {...fadeIn} transition={{ delay: 0.5 }}>
-            <FeatureCard
-              icon={GitCompare}
-              title="Deep Integrations"
-              description="Connect with your favorite tools including CRM, ERP, and business applications."
-            />
-          </motion.div>
-          <motion.div {...fadeIn} transition={{ delay: 0.6 }}>
-            <FeatureCard
-              icon={Briefcase}
-              title="Industry Solutions"
-              description="Tailored solutions for Real Estate, Healthcare, E-commerce, and more."
-            />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Comparison Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center mb-16"
-            {...fadeIn}
+      <div className="relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-40 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
+        
+        <div className="relative pt-20 pb-40 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-center space-y-8"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose Huerize?
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              See how we compare to other solutions in the market.
-            </p>
+            <motion.div variants={itemVariants}>
+              <span className="px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-sm font-medium inline-block mb-4 backdrop-blur-sm border border-white/10">
+                ✨ Introducing Huerize
+              </span>
+            </motion.div>
+
+            <motion.h1 
+              variants={itemVariants}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight text-glow"
+            >
+              AI Voice is the new way
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+                to connect with customers.
+              </span>
+            </motion.h1>
+
+            <motion.p 
+              variants={itemVariants}
+              className="text-xl text-gray-400 max-w-2xl mx-auto"
+            >
+              Beautifully designed, AI-powered voice automation and workflow tools built with
+              cutting-edge technology.
+            </motion.p>
+
+            <motion.div 
+              variants={itemVariants}
+              className="flex justify-center gap-4"
+            >
+              <Button
+                size="lg"
+                className="group relative bg-white text-black hover:bg-white/90 px-8"
+              >
+                <span className="relative z-10">Get Started for free</span>
+                <ArrowRight className="ml-2 w-4 h-4 relative z-10" />
+              </Button>
+            </motion.div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Huerize</h3>
-              <ComparisonFeature feature="AI Voice Agents" isAvailable={true} />
-              <ComparisonFeature feature="Workflow Automation" isAvailable={true} />
-              <ComparisonFeature feature="Multilingual Support" isAvailable={true} />
-              <ComparisonFeature feature="Custom API Integrations" isAvailable={true} />
-              <ComparisonFeature feature="White-labeling" isAvailable={true} />
+          {/* Dashboard Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="mt-20 relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent h-40 -bottom-1 z-10" />
+            <div className="glass-card rounded-xl overflow-hidden">
+              <img 
+                src="/lovable-uploads/c3894d12-d7e6-4113-b1f0-b18e6d53eb39.png"
+                alt="Dashboard Preview"
+                className="w-full rounded-lg shadow-2xl"
+              />
             </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">VAPI AI</h3>
-              <ComparisonFeature feature="AI Voice Agents" isAvailable={true} />
-              <ComparisonFeature feature="Workflow Automation" isAvailable={false} />
-              <ComparisonFeature feature="Multilingual Support" isAvailable={false} />
-              <ComparisonFeature feature="Custom API Integrations" isAvailable={true} />
-              <ComparisonFeature feature="White-labeling" isAvailable={true} />
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Retell AI</h3>
-              <ComparisonFeature feature="AI Voice Agents" isAvailable={true} />
-              <ComparisonFeature feature="Workflow Automation" isAvailable={false} />
-              <ComparisonFeature feature="Multilingual Support" isAvailable={true} />
-              <ComparisonFeature feature="Custom API Integrations" isAvailable={true} />
-              <ComparisonFeature feature="White-labeling" isAvailable={false} />
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
