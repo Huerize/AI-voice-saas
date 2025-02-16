@@ -76,4 +76,9 @@
   .button-glow:hover::before {
     @apply opacity-100;
   }
+
+  /* Bento grid animations */
+  .bento-hover {
+    @apply transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-xl;
+  }
 }

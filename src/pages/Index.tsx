@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Bell, Share2, Repeat, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { Marquee } from "@/components/marquee";
 
 const Index = () => {
   const containerVariants = {
@@ -24,9 +26,55 @@ const Index = () => {
     }
   };
 
+  const features = [
+    {
+      Icon: Share2,
+      name: "Thousands of Integrations",
+      description: "Connect with your favorite tools and automate your workflow with our extensive integration library.",
+      className: "col-span-2",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-2xl" />
+        </div>
+      ),
+    },
+    {
+      Icon: Bell,
+      name: "24/7 AI Agents",
+      description: "Our AI agents work around the clock to ensure your tasks are completed efficiently and accurately.",
+      className: "col-span-1",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 blur-2xl" />
+        </div>
+      ),
+    },
+    {
+      Icon: Repeat,
+      name: "Multiple Language Support",
+      description: "Break language barriers with support for over 100 languages, enabling global communication.",
+      className: "col-span-1",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 blur-2xl" />
+        </div>
+      ),
+    },
+    {
+      Icon: Clock,
+      name: "Task-Specific Agents",
+      description: "Specialized AI agents for different tasks, from customer service to data analysis.",
+      className: "col-span-2",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-green-500 to-blue-500 blur-2xl" />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -51,9 +99,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <div className="relative">
-        {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
         <div className="absolute top-20 left-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
         <div className="absolute top-40 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
@@ -104,7 +150,6 @@ const Index = () => {
             </motion.div>
           </motion.div>
 
-          {/* Dashboard Preview */}
           <motion.div
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,7 +168,40 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Trusted By Section */}
+      <section className="py-32 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Powerful Features for Modern Teams
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Everything you need to streamline your workflow and boost productivity
+            </p>
+          </motion.div>
+
+          <BentoGrid>
+            {features.map((feature, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <BentoCard {...feature} />
+              </motion.div>
+            ))}
+          </BentoGrid>
+        </div>
+      </section>
+
       <section className="py-20 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -134,7 +212,6 @@ const Index = () => {
           >
             <h2 className="text-base text-gray-400 mb-8">Trusted by innovative companies</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center opacity-50">
-              {/* Add company logos here */}
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="h-12 w-full bg-white/10 rounded" />
               ))}
@@ -143,7 +220,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
       <section className="py-20 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -193,7 +269,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
