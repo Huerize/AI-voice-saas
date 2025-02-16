@@ -3,6 +3,7 @@ import { ArrowRight, Check, Bell, Share2, Repeat, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { Marquee } from "@/components/marquee";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const containerVariants = {
