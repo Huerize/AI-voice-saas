@@ -1,9 +1,15 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Bell, Share2, Repeat, Clock } from "lucide-react";
+import { ArrowRight, Check, Bell, Share2, Repeat, Clock, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { Marquee } from "@/components/marquee";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const containerVariants = {
@@ -147,10 +153,29 @@ const Index = () => {
             <div className="flex items-center">
               <span className="text-xl font-bold text-white">Magic UI</span>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+            <nav className="hidden md:flex items-center space-x-8">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+                  Features <ChevronDown className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Voice Recognition</DropdownMenuItem>
+                  <DropdownMenuItem>AI Agents</DropdownMenuItem>
+                  <DropdownMenuItem>Analytics</DropdownMenuItem>
+                  <DropdownMenuItem>Integrations</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+                  Solutions <ChevronDown className="w-4 h-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Enterprise</DropdownMenuItem>
+                  <DropdownMenuItem>Small Business</DropdownMenuItem>
+                  <DropdownMenuItem>Startups</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
-              <a href="#careers" className="text-gray-300 hover:text-white transition-colors">Careers</a>
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>
             <div className="flex items-center space-x-4">
@@ -165,19 +190,19 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="relative min-h-screen">
+      <div className="relative min-h-[90vh]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="text-center space-y-8 py-32"
+            className="flex flex-col items-center justify-center min-h-[90vh] text-center space-y-8 py-16 sm:py-20"
           >
             <motion.div variants={itemVariants}>
               <span className="px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-sm font-medium inline-block mb-4 backdrop-blur-sm border border-white/10">
@@ -187,7 +212,7 @@ const Index = () => {
 
             <motion.h1 
               variants={itemVariants}
-              className="text-6xl sm:text-7xl lg:text-8xl font-medium text-white leading-none tracking-tight"
+              className="text-5xl sm:text-6xl lg:text-7xl font-medium text-white leading-none tracking-tight max-w-4xl mx-auto"
               style={{ fontFamily: "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif" }}
             >
               Supercharge your
@@ -201,7 +226,7 @@ const Index = () => {
 
             <motion.p 
               variants={itemVariants}
-              className="text-xl text-neutral-400 max-w-2xl mx-auto font-light"
+              className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto font-light"
             >
               Build, test, and deploy production-ready AI voice agents at scale. 
               Automate customer interactions with natural conversations.
@@ -209,11 +234,11 @@ const Index = () => {
 
             <motion.div 
               variants={itemVariants}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
             >
               <Button
                 size="lg"
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-12 text-base font-medium"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
               >
                 Get Started for free
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -221,32 +246,16 @@ const Index = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full px-8 h-12 text-base font-medium border-white/10 hover:bg-white/5"
+                className="rounded-full px-8 h-12 text-base font-medium border-white/10 hover:bg-white/5 w-full sm:w-auto"
               >
                 Book a demo
               </Button>
             </motion.div>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent h-40 -bottom-1 z-10" />
-            <div className="glass-card rounded-xl overflow-hidden">
-              <img 
-                src="/lovable-uploads/a52d6d6c-7033-4711-bdd0-79da0895eb0a.png"
-                alt="Dashboard Preview"
-                className="w-full rounded-lg shadow-2xl"
-              />
-            </div>
-          </motion.div>
         </div>
       </div>
 
-      <section className="py-32 relative">
+      <section className="py-20 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -298,7 +307,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
       <section className="py-20 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -358,7 +366,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section className="py-20 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -389,7 +396,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/10 py-12 bg-gradient-to-b from-transparent to-purple-500/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
