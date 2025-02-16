@@ -26,6 +26,7 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.75rem;
+    --bg-size: 400%;
   }
 
   * {
@@ -59,6 +60,22 @@
 
   .text-glow {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  .animate-gradient {
+    animation: move-gradient 8s infinite linear;
+  }
+
+  @keyframes move-gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   /* Navigation hover effects */

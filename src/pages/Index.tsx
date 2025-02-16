@@ -1,9 +1,15 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Bell, Share2, Repeat, Clock, ChevronDown } from "lucide-react";
+import { ArrowRight, Check, Bell, Share2, Repeat, Clock, ChevronRight, Shield, LayoutDashboard, FileText, Mic2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { Marquee } from "@/components/marquee";
 import { cn } from "@/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,9 +41,9 @@ const Index = () => {
 
   const features = [
     {
-      Icon: Share2,
-      name: "Thousands of Integrations",
-      description: "Connect with your favorite tools and automate your workflow with our extensive integration library.",
+      Icon: Shield,
+      name: "Advanced Security",
+      description: "Enterprise-grade security with end-to-end encryption and compliance certifications.",
       className: "col-span-2",
       background: (
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
@@ -46,9 +52,9 @@ const Index = () => {
       ),
     },
     {
-      Icon: Bell,
-      name: "24/7 AI Agents",
-      description: "Our AI agents work around the clock to ensure your tasks are completed efficiently and accurately.",
+      Icon: LayoutDashboard,
+      name: "Beautiful Dashboard",
+      description: "Organize and manage calls efficiently with our intuitive dashboard interface.",
       className: "col-span-1",
       background: (
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
@@ -57,9 +63,9 @@ const Index = () => {
       ),
     },
     {
-      Icon: Repeat,
-      name: "Multiple Language Support",
-      description: "Break language barriers with support for over 100 languages, enabling global communication.",
+      Icon: FileText,
+      name: "Call Transcripts",
+      description: "Automatic transcription with high accuracy and multiple language support.",
       className: "col-span-1",
       background: (
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
@@ -68,9 +74,9 @@ const Index = () => {
       ),
     },
     {
-      Icon: Clock,
-      name: "Task-Specific Agents",
-      description: "Specialized AI agents for different tasks, from customer service to data analysis.",
+      Icon: Mic2,
+      name: "Call Recordings",
+      description: "Secure storage and easy access to all your call recordings with advanced search.",
       className: "col-span-2",
       background: (
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
@@ -145,6 +151,12 @@ const Index = () => {
     }
   ];
 
+  const trustedBy = [
+    { name: "Deepgram", logo: "deepgram.svg" },
+    { name: "ElevenLabs", logo: "elevenlabs.svg" },
+    { name: "Microsoft", logo: "microsoft.svg" }
+  ];
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/10">
@@ -190,11 +202,11 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="relative min-h-[90vh]">
+      <div className="relative min-h-[95vh]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
         </div>
 
         <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -202,17 +214,23 @@ const Index = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-center justify-center min-h-[90vh] text-center space-y-8 py-16 sm:py-20"
+            className="flex flex-col items-center justify-center min-h-[95vh] text-center space-y-8 py-16 sm:py-20"
           >
-            <motion.div variants={itemVariants}>
-              <span className="px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-sm font-medium inline-block mb-4 backdrop-blur-sm border border-white/10">
-                ✨ Welcome to the Future of Voice AI →
-              </span>
+            <motion.div variants={itemVariants} className="w-full">
+              <AnimatedGradientText>
+                🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
+                <span className={cn(
+                  "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
+                )}>
+                  Introducing Magic UI
+                </span>
+                <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+              </AnimatedGradientText>
             </motion.div>
 
             <motion.h1 
               variants={itemVariants}
-              className="text-5xl sm:text-6xl lg:text-7xl font-medium text-white leading-none tracking-tight max-w-4xl mx-auto"
+              className="text-6xl sm:text-7xl lg:text-8xl font-medium text-white leading-none tracking-tight max-w-5xl mx-auto"
               style={{ fontFamily: "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif" }}
             >
               Supercharge your
@@ -250,6 +268,20 @@ const Index = () => {
               >
                 Book a demo
               </Button>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="mt-16 pt-8 border-t border-white/10 w-full"
+            >
+              <p className="text-sm text-gray-400 mb-6">Trusted by Industry Leaders</p>
+              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-16">
+                {trustedBy.map((company) => (
+                  <div key={company.name} className="flex items-center space-x-2">
+                    <span className="text-xl font-semibold text-white">{company.name}</span>
+                  </div>
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -307,7 +339,14 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-20 border-t border-white/10">
+      {/* Pricing Section with enhanced glassmorphism */}
+      <section className="py-20 border-t border-white/10 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        </div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -366,6 +405,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* FAQ Section with Accordion */}
       <section className="py-20 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -378,21 +418,18 @@ const Index = () => {
             <p className="text-gray-400">Everything you need to know about our AI voice agents</p>
           </motion.div>
 
-          <div className="space-y-6">
+          <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
-                <p className="text-gray-400">{faq.answer}</p>
-              </motion.div>
+              <AccordionItem key={i} value={`item-${i}`} className="glass-card border-none">
+                <AccordionTrigger className="text-lg font-semibold text-white px-6">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-400 px-6 pb-4">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </section>
 
