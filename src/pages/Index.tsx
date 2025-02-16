@@ -79,7 +79,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-white">Huerize</span>
+              <span className="text-xl font-bold text-white">Magic UI</span>
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
@@ -92,60 +92,70 @@ const Index = () => {
                 Log in
               </Button>
               <Button className="bg-white text-black hover:bg-white/90">
-                Try for free
+                Sign up
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-40 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
-        
-        <div className="relative pt-32 pb-40 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="relative min-h-screen">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="text-center space-y-8"
+            className="text-center space-y-8 py-32"
           >
             <motion.div variants={itemVariants}>
               <span className="px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-sm font-medium inline-block mb-4 backdrop-blur-sm border border-white/10">
-                ✨ Introducing Huerize
+                ✨ Introducing Magic UI Template →
               </span>
             </motion.div>
 
             <motion.h1 
               variants={itemVariants}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight text-glow"
+              className="text-6xl sm:text-7xl lg:text-8xl font-medium text-white leading-none tracking-tight"
+              style={{ fontFamily: "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif" }}
             >
-              AI Voice is the new way
+              Magic UI is the new way
               <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
-                to connect with customers.
+              <span className="text-neutral-400">
+                to build landing pages.
               </span>
             </motion.h1>
 
             <motion.p 
               variants={itemVariants}
-              className="text-xl text-gray-400 max-w-2xl mx-auto"
+              className="text-xl text-neutral-400 max-w-2xl mx-auto font-light"
             >
-              Beautifully designed, AI-powered voice automation and workflow tools built with
-              cutting-edge technology.
+              Beautifully designed, animated components and templates built with
+              Tailwind CSS, React, and Framer Motion.
             </motion.p>
 
             <motion.div 
               variants={itemVariants}
-              className="flex justify-center gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
             >
               <Button
                 size="lg"
-                className="group relative bg-white text-black hover:bg-white/90 px-8"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-12 text-base font-medium"
               >
-                <span className="relative z-10">Get Started for free</span>
-                <ArrowRight className="ml-2 w-4 h-4 relative z-10" />
+                Get Started for free
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8 h-12 text-base font-medium border-white/10 hover:bg-white/5"
+              >
+                Book a demo
               </Button>
             </motion.div>
           </motion.div>
@@ -154,12 +164,12 @@ const Index = () => {
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="mt-20 relative"
+            className="relative"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent h-40 -bottom-1 z-10" />
             <div className="glass-card rounded-xl overflow-hidden">
               <img 
-                src="/lovable-uploads/a42367f7-3454-4c70-8058-2287bfe916a0.png"
+                src="/lovable-uploads/a52d6d6c-7033-4711-bdd0-79da0895eb0a.png"
                 alt="Dashboard Preview"
                 className="w-full rounded-lg shadow-2xl"
               />
