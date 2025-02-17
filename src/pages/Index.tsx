@@ -3,6 +3,7 @@ import { ArrowRight, Check, Bell, Share2, Repeat, Clock, ChevronRight, Shield, L
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { cn } from "@/lib/utils";
+import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Index = () => {
+  const { isSignedIn, user } = useUser();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -213,12 +216,28 @@ const Index = () => {
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">
-                Log in
-              </Button>
-              <Button className="bg-violet-600 text-white hover:bg-violet-700">
-                Sign up
-              </Button>
+              {isSignedIn ? (
+                <Button
+                  variant="ghost"
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => window.location.href = '/dashboard'}
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost" className="text-gray-300 hover:text-white">
+                      Sign in
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button className="bg-violet-600 text-white hover:bg-violet-700">
+                      Sign up for free
+                    </Button>
+                  </SignUpButton>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -236,20 +255,18 @@ const Index = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-center justify-center min-h-[95vh] text-center space-y-8 pt-20"
+            className="flex flex-col items-center justify-center min-h-[95vh] text-center space-y-6 pt-20"
           >
-            <motion.div variants={itemVariants} className="w-full">
-              <AnimatedGradientText>
-                <div className="rounded-full border border-violet-500/20 bg-white/5 px-4 py-1.5 backdrop-blur">
-                  🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
-                  <span className={cn(
-                    "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
-                  )}>
-                    Introducing Magic UI
-                  </span>
-                  <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-                </div>
-              </AnimatedGradientText>
+            <motion.div variants={itemVariants} className="w-full mb-2">
+              <div className="inline-flex items-center rounded-full border border-violet-500/20 bg-white/5 px-3 py-1 text-sm backdrop-blur">
+                🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
+                <span className={cn(
+                  "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
+                )}>
+                  Introducing Magic UI
+                </span>
+                <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+              </div>
             </motion.div>
 
             <motion.h1 
@@ -278,20 +295,47 @@ const Index = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
             >
-              <Button
-                size="lg"
-                className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
-              >
-                Get Started for free
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full px-8 h-12 text-base font-medium border-white/10 hover:bg-white/5 w-full sm:w-auto"
-              >
-                Book a demo
-              </Button>
+              {isSignedIn ? (
+                <Button
+                  size="lg"
+                  className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
+                  onClick={() => window.location.href = '/dashboard'}
+                >
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              ) : (
+                <>
+                  <SignUpButton mode="modal">
+                    <Button
+                      size="lg"
+                      className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
+                    >
+                      Get Started for free
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </SignUpButton>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-full px-8 h-12 text-base font-medium border-white/10 hover:bg-white/5 w-full sm:w-auto"
+                  >
+                    Book a demo
+                  </Button>
+                </>
+              )}
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="mt-16 pt-8 border-t border-white/10 w-full"
+            >
+              <p className="text-sm text-gray-400 mb-6">Trusted by Industry Leaders</p>
+              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-16">
+                <span className="text-xl font-semibold text-white">Deepgram</span>
+                <span className="text-xl font-semibold text-white">ElevenLabs</span>
+                <span className="text-xl font-semibold text-white">Microsoft</span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
