@@ -84,6 +84,28 @@ const Index = () => {
         </div>
       ),
     },
+    {
+      Icon: Bell,
+      name: "Smart Notifications",
+      description: "Get instant alerts and notifications for important calls and events with AI-powered prioritization.",
+      className: "col-span-1",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 blur-2xl" />
+        </div>
+      ),
+    },
+    {
+      Icon: Share2,
+      name: "Team Collaboration",
+      description: "Share calls, transcripts, and insights with your team in real-time for better coordination.",
+      className: "col-span-1",
+      background: (
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 blur-2xl" />
+        </div>
+      ),
+    },
   ];
 
   const pricingTiers = [
@@ -194,7 +216,7 @@ const Index = () => {
               <Button variant="ghost" className="text-gray-300 hover:text-white">
                 Log in
               </Button>
-              <Button className="bg-white text-black hover:bg-white/90">
+              <Button className="bg-violet-600 text-white hover:bg-violet-700">
                 Sign up
               </Button>
             </div>
@@ -204,8 +226,8 @@ const Index = () => {
 
       <div className="relative min-h-[95vh]">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
         </div>
 
@@ -214,23 +236,25 @@ const Index = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-center justify-center min-h-[95vh] text-center space-y-8 py-16 sm:py-20"
+            className="flex flex-col items-center justify-center min-h-[95vh] text-center space-y-8 pt-20"
           >
             <motion.div variants={itemVariants} className="w-full">
               <AnimatedGradientText>
-                🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
-                <span className={cn(
-                  "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
-                )}>
-                  Introducing Magic UI
-                </span>
-                <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+                <div className="rounded-full border border-violet-500/20 bg-white/5 px-4 py-1.5 backdrop-blur">
+                  🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
+                  <span className={cn(
+                    "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
+                  )}>
+                    Introducing Magic UI
+                  </span>
+                  <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+                </div>
               </AnimatedGradientText>
             </motion.div>
 
             <motion.h1 
               variants={itemVariants}
-              className="text-6xl sm:text-7xl lg:text-8xl font-medium text-white leading-none tracking-tight max-w-5xl mx-auto"
+              className="text-5xl sm:text-6xl lg:text-7xl font-medium text-white leading-none tracking-tight max-w-4xl mx-auto"
               style={{ fontFamily: "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif" }}
             >
               Supercharge your
@@ -256,7 +280,7 @@ const Index = () => {
             >
               <Button
                 size="lg"
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
+                className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
               >
                 Get Started for free
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -269,26 +293,12 @@ const Index = () => {
                 Book a demo
               </Button>
             </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              className="mt-16 pt-8 border-t border-white/10 w-full"
-            >
-              <p className="text-sm text-gray-400 mb-6">Trusted by Industry Leaders</p>
-              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-16">
-                {trustedBy.map((company) => (
-                  <div key={company.name} className="flex items-center space-x-2">
-                    <span className="text-xl font-semibold text-white">{company.name}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
 
       <section className="py-20 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -339,11 +349,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section with enhanced glassmorphism */}
       <section className="py-20 border-t border-white/10 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent opacity-20" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         </div>
         
@@ -405,7 +414,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ Section with Accordion */}
       <section className="py-20 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -433,7 +441,7 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-12 bg-gradient-to-b from-transparent to-purple-500/5">
+      <footer className="border-t border-white/10 py-12 bg-gradient-to-b from-transparent to-violet-500/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
