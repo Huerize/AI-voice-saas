@@ -14,6 +14,9 @@ const queryClient = new QueryClient();
 // In Vite, we use import.meta.env instead of process.env
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+// Add console.log to help debug
+console.log("Clerk Key Available:", !!clerkPubKey);
+
 const App = () => (
   <ClerkProvider publishableKey={clerkPubKey}>
     <QueryClientProvider client={queryClient}>
