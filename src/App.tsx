@@ -11,8 +11,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// You'll need to set your Clerk publishable key
-const clerkPubKey = process.env.VITE_CLERK_PUBLISHABLE_KEY;
+// In Vite, we use import.meta.env instead of process.env
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 const App = () => (
   <ClerkProvider publishableKey={clerkPubKey}>
