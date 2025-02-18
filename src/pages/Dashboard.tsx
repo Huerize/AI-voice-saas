@@ -1,28 +1,23 @@
 
 import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
-  const { isSignedIn, isLoaded, user } = useUser();
-
-  console.log("Dashboard rendering:", { isSignedIn, isLoaded });
-
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
-        <div className="text-white text-lg">Loading...</div>
-      </div>
-    );
-  }
+  const { isSignedIn, user } = useUser();
 
   if (!isSignedIn) {
-    return <Navigate to="/sign-in" />;
+    return <Navigate to="/" />;
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white p-8">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user?.firstName || 'User'}!</h1>
-      <p>You are signed in to the dashboard.</p>
+    <div className="min-h-screen bg-[#0A0A0B]">
+      <div className="flex">
+        {/* We'll implement the full dashboard UI in the next iteration */}
+        <main className="flex-1 p-8">
+          <h1 className="text-2xl font-bold text-white">Welcome back, {user.firstName}!</h1>
+        </main>
+      </div>
     </div>
   );
 };
