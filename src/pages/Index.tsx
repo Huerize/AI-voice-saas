@@ -4,7 +4,11 @@ import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 
 const Index = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
 
   if (isSignedIn) {
     return <Navigate to="/dashboard" />;
@@ -26,6 +30,8 @@ const Index = () => {
               footerActionLink: "text-violet-400 hover:text-violet-300",
             },
           }}
+          routing="path"
+          path="/sign-in"
         />
       </div>
     </div>
