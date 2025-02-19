@@ -7,16 +7,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import Marquee from "@/components/ui/marquee";
+
 const Index = () => {
-  const {
-    isSignedIn,
-    user
-  } = useUser();
+  const { isSignedIn, user } = useUser();
+  const navigate = useNavigate();
+
   const containerVariants = {
-    hidden: {
-      opacity: 0
-    },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
@@ -24,6 +23,7 @@ const Index = () => {
       }
     }
   };
+
   const itemVariants = {
     hidden: {
       opacity: 0,
@@ -37,6 +37,7 @@ const Index = () => {
       }
     }
   };
+
   const features = [{
     Icon: Shield,
     name: "Advanced Security",
@@ -86,6 +87,7 @@ const Index = () => {
           <div className="w-32 h-32 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 blur-2xl" />
         </div>
   }];
+
   const pricingTiers = [{
     name: "Starter",
     price: "Free",
@@ -104,6 +106,7 @@ const Index = () => {
     description: "For large-scale operations",
     features: ["Unlimited AI Agents", "Custom minutes/month", "Enterprise analytics", "24/7 dedicated support", "Custom voice models", "Advanced integrations", "SLA guarantees", "Custom deployment"]
   }];
+
   const faqs = [{
     question: "How accurate is the voice recognition?",
     answer: "Our AI voice recognition system achieves over 95% accuracy across multiple languages and accents, powered by state-of-the-art machine learning models."
@@ -117,6 +120,7 @@ const Index = () => {
     question: "How does billing work?",
     answer: "Billing is based on the minutes of voice interaction processed. You only pay for what you use, and unused minutes roll over to the next month on paid plans."
   }];
+
   const trustedBy = [{
     name: "Deepgram",
     logo: "deepgram.svg"
@@ -127,7 +131,9 @@ const Index = () => {
     name: "Microsoft",
     logo: "microsoft.svg"
   }];
-  return <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -160,7 +166,21 @@ const Index = () => {
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>
             <div className="flex items-center space-x-4">
-              {isSignedIn ? <span className="text-white">Welcome, {user.firstName}</span> : <>
+              {isSignedIn ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="text-gray-300 hover:text-white flex items-center gap-2"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Button>
+                  <div className="h-6 w-px bg-white/10" />
+                  <span className="text-white">Welcome, {user.firstName}</span>
+                </>
+              ) : (
+                <>
                   <SignInButton mode="modal">
                     <Button variant="ghost" className="text-gray-300 hover:text-white">
                       Sign in
@@ -171,7 +191,8 @@ const Index = () => {
                       Sign up for free
                     </Button>
                   </SignUpButton>
-                </>}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -474,6 +495,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
