@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SignInButton, useUser } from "@clerk/clerk-react";
+import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 
 const Index = () => {
   const { isSignedIn, user } = useUser();
@@ -219,11 +219,18 @@ const Index = () => {
               {isSignedIn ? (
                 <span className="text-white">Welcome, {user.firstName}</span>
               ) : (
-                <SignInButton mode="modal">
-                  <Button className="bg-violet-600 text-white hover:bg-violet-700">
-                    Sign in
-                  </Button>
-                </SignInButton>
+                <>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost" className="text-gray-300 hover:text-white">
+                      Sign in
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button className="bg-violet-600 text-white hover:bg-violet-700">
+                      Sign up for free
+                    </Button>
+                  </SignUpButton>
+                </>
               )}
             </div>
           </div>
@@ -284,13 +291,15 @@ const Index = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
             >
-              <Button
-                size="lg"
-                className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
-              >
-                Get Started for free
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+              <SignUpButton mode="modal">
+                <Button
+                  size="lg"
+                  className="bg-violet-600 text-white hover:bg-violet-700 rounded-full px-8 h-12 text-base font-medium w-full sm:w-auto"
+                >
+                  Get Started for free
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </SignUpButton>
               <Button
                 size="lg"
                 variant="outline"
@@ -302,6 +311,33 @@ const Index = () => {
           </motion.div>
         </div>
       </div>
+
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <h2 className="text-base text-gray-400 mb-8">Trusted by innovative companies</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center opacity-50">
+              <div className="flex items-center justify-center">
+                <img src="/logos/elevenlabs.svg" alt="ElevenLabs" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/deepgram.svg" alt="Deepgram" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/microsoft.svg" alt="Microsoft" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/openai.svg" alt="OpenAI" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       <section className="py-20 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent" />
