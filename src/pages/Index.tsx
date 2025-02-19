@@ -16,8 +16,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SignInButton, useUser } from "@clerk/clerk-react";
 
 const Index = () => {
+  const { isSignedIn, user } = useUser();
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -213,12 +216,15 @@ const Index = () => {
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
             </nav>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">
-                Log in
-              </Button>
-              <Button className="bg-violet-600 text-white hover:bg-violet-700">
-                Sign up
-              </Button>
+              {isSignedIn ? (
+                <span className="text-white">Welcome, {user.firstName}</span>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button className="bg-violet-600 text-white hover:bg-violet-700">
+                    Sign in
+                  </Button>
+                </SignInButton>
+              )}
             </div>
           </div>
         </div>
@@ -240,8 +246,8 @@ const Index = () => {
           >
             <motion.div variants={itemVariants} className="w-full">
               <AnimatedGradientText>
-                <div className="rounded-full border border-violet-500/20 bg-white/5 px-4 py-1.5 backdrop-blur">
-                  🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300" />{" "}
+                <div className="inline-flex items-center rounded-full border border-violet-500/20 bg-white/5 px-3 py-1 text-sm backdrop-blur">
+                  🎉 <hr className="mx-2 h-4 w-px shrink-0 bg-gray-300/20" />
                   <span className={cn(
                     "inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent"
                   )}>
@@ -438,6 +444,33 @@ const Index = () => {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      <section className="py-20 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <h2 className="text-2xl font-semibold text-white mb-12">Trusted by Industry Leaders</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
+              <div className="flex items-center justify-center">
+                <img src="/logos/elevenlabs.svg" alt="ElevenLabs" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/deepgram.svg" alt="Deepgram" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/microsoft.svg" alt="Microsoft" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="flex items-center justify-center">
+                <img src="/logos/openai.svg" alt="OpenAI" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
