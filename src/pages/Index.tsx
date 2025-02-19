@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
+import Marquee from "@/components/ui/marquee";
 
 const Index = () => {
   const { isSignedIn, user } = useUser();
@@ -321,20 +322,7 @@ const Index = () => {
             className="text-center"
           >
             <h2 className="text-base text-gray-400 mb-8">Trusted by innovative companies</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center opacity-50">
-              <div className="flex items-center justify-center">
-                <img src="/logos/elevenlabs.svg" alt="ElevenLabs" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="flex items-center justify-center">
-                <img src="/logos/deepgram.svg" alt="Deepgram" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="flex items-center justify-center">
-                <img src="/logos/microsoft.svg" alt="Microsoft" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="flex items-center justify-center">
-                <img src="/logos/openai.svg" alt="OpenAI" className="h-8 opacity-70 hover:opacity-100 transition-opacity" />
-              </div>
-            </div>
+            <Marquee speed="normal" pauseOnHover fade />
           </motion.div>
         </div>
       </section>
