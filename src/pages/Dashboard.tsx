@@ -1,4 +1,3 @@
-
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +6,7 @@ import {
   LayoutDashboard, Settings, Users, Bell, Phone, Calendar, 
   Database, Languages, Bot, FileText, Search, ChevronDown,
   ArrowUpRight, BarChart3, TrendingUp, Clock, Key, Shield, 
-  LogOut, Mic, MessageCircle, VoiceIcon, Activity
+  LogOut, Mic, MessageCircle, Activity
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const { user } = useUser();
