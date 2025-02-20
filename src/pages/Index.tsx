@@ -46,7 +46,7 @@ const Index = () => {
     Icon: Shield,
     name: "Advanced Security",
     description: "Enterprise-grade security with end-to-end encryption and compliance certifications.",
-    className: "col-span-2",
+    className: "col-span-1",
     background: <div className="absolute inset-0 flex items-center justify-center opacity-10">
           <div className="w-32 h-32 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 blur-2xl" />
         </div>
@@ -70,7 +70,7 @@ const Index = () => {
     Icon: Mic2,
     name: "Call Recordings",
     description: "Secure storage and easy access to all your call recordings with advanced search.",
-    className: "col-span-2",
+    className: "col-span-1",
     background: <div className="absolute inset-0 flex items-center justify-center opacity-10">
           <div className="w-32 h-32 rounded-full bg-gradient-to-r from-green-500 to-blue-500 blur-2xl" />
         </div>
@@ -276,22 +276,22 @@ const Index = () => {
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <BentoGrid className="gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <BentoCard
                 key={feature.name}
                 {...feature}
                 className={cn(
-                  "backdrop-blur-xl bg-violet-500/5 border-violet-500/10 hover:border-violet-500/20",
+                  "backdrop-blur-xl bg-violet-500/5 border-violet-500/10 hover:border-violet-500/20 h-[240px]",
                   feature.className
                 )}
               />
             ))}
-          </BentoGrid>
+          </div>
         </div>
       </section>
 
@@ -409,15 +409,9 @@ const Index = () => {
           <div className="mt-12 pt-8 border-t border-violet-500/10 flex flex-col md:flex-row items-center justify-between">
             <p className="text-gray-400">© 2024 VoiceAI. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
-                Twitter
-              </a>
-              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
-                GitHub
-              </a>
-              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
-                LinkedIn
-              </a>
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Twitter</a>
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">GitHub</a>
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">LinkedIn</a>
             </div>
           </div>
         </div>
