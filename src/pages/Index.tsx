@@ -9,10 +9,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import Marquee from "@/components/ui/marquee";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
+  const [isYearly, setIsYearly] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,13 +93,13 @@ const Index = () => {
 
   const pricingTiers = [{
     name: "Starter",
-    price: "Free",
+    price: isYearly ? "Free" : "Free",
     description: "Perfect for trying out our AI voice agents",
     features: ["1 AI Voice Agent", "100 minutes/month", "Basic analytics", "Email support", "Standard voice models"]
   }, {
     name: "Pro",
-    price: "$49",
-    period: "/month",
+    price: isYearly ? "$470" : "$49",
+    period: isYearly ? "/year" : "/month",
     description: "Ideal for growing businesses",
     features: ["5 AI Voice Agents", "1,000 minutes/month", "Advanced analytics", "Priority support", "Premium voice models", "Custom workflows", "API access"],
     popular: true
@@ -227,7 +230,7 @@ const Index = () => {
               Call Operations
               <br />
               <span className="text-neutral-400">
-                with Voice AI.
+                with <span className="text-violet-500">Voice AI</span>.
               </span>
             </motion.h1>
 
@@ -254,100 +257,27 @@ const Index = () => {
       <section className="py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{
-          opacity: 0
-        }} whileInView={{
-          opacity: 1
-        }} viewport={{
-          once: true
-        }} className="text-center">
-            <h2 className="text-base text-gray-400 mb-8">Trusted by innovative companies</h2>
+            opacity: 0
+          }} whileInView={{
+            opacity: 1
+          }} viewport={{
+            once: true
+          }} className="text-center">
+            <h2 className="text-2xl font-semibold text-white mb-8">Trusted by Industry Leaders</h2>
             <Marquee speed="normal" pauseOnHover fade />
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Powerful Features for Modern Teams
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Everything you need to streamline your workflow and boost productivity
-            </p>
-          </motion.div>
-
-          <BentoGrid>
-            {features.map((feature, idx) => <motion.div key={idx} initial={{
-            opacity: 0,
-            y: 20
-          }} whileInView={{
-            opacity: 1,
-            y: 0
-          }} viewport={{
-            once: true
-          }} transition={{
-            delay: idx * 0.1
-          }}>
-                <BentoCard {...feature} />
-              </motion.div>)}
-          </BentoGrid>
-        </div>
-      </section>
-
-      <section className="py-20 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{
-          opacity: 0
-        }} whileInView={{
-          opacity: 1
-        }} viewport={{
-          once: true
-        }} className="text-center">
-            <h2 className="text-base text-gray-400 mb-8">
-          </h2>
-            <div className="">
-              {Array.from({
-              length: 4
-            }).map((_, i) => <div key={i} className="h-12 w-full bg-white/10 rounded" />)}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-20 border-t border-white/10 relative overflow-hidden">
+      <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         </div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Simple, transparent pricing</h2>
-            <p className="text-gray-400">Start building with AI voice agents today</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingTiers.map((plan, i) => <motion.div key={plan.name} initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -355,12 +285,52 @@ const Index = () => {
             y: 0
           }} viewport={{
             once: true
-          }} transition={{
-            delay: i * 0.1
-          }} className={cn("glass-card p-8 rounded-xl relative", plan.popular && "border-purple-500/50 shadow-purple-500/20")}>
-                {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-purple-500 text-white text-sm rounded-full">
+          }} className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">Simple, transparent pricing</h2>
+            <p className="text-gray-400 mb-8">Start building with AI voice agents today</p>
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <Label htmlFor="billing-toggle" className="text-sm text-gray-400">Monthly</Label>
+              <Switch
+                id="billing-toggle"
+                checked={isYearly}
+                onCheckedChange={setIsYearly}
+                className="data-[state=checked]:bg-violet-600"
+              />
+              <Label htmlFor="billing-toggle" className="text-sm text-gray-400">
+                Yearly
+                <span className="ml-2 text-xs text-violet-400">(Save 20%)</span>
+              </Label>
+            </div>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {pricingTiers.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                initial={{
+                  opacity: 0,
+                  y: 20
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0
+                }}
+                viewport={{
+                  once: true
+                }}
+                transition={{
+                  delay: i * 0.1
+                }}
+                className={cn(
+                  "relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-8 hover:border-violet-500/50 transition-colors",
+                  plan.popular && "border-violet-500/50 shadow-lg shadow-violet-500/20"
+                )}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-violet-600 text-white text-sm rounded-full">
                     Most Popular
-                  </div>}
+                  </div>
+                )}
                 <h3 className="text-xl font-semibold text-white mb-4">{plan.name}</h3>
                 <div className="mb-8">
                   <span className="text-4xl font-bold text-white">{plan.price}</span>
@@ -368,15 +338,25 @@ const Index = () => {
                   <p className="text-sm text-gray-400 mt-2">{plan.description}</p>
                 </div>
                 <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, j) => <li key={j} className="flex items-center text-gray-300">
-                      <Check className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
+                  {plan.features.map((feature, j) => (
+                    <li key={j} className="flex items-center text-gray-300">
+                      <Check className="w-5 h-5 text-violet-400 mr-2 flex-shrink-0" />
                       <span>{feature}</span>
-                    </li>)}
+                    </li>
+                  ))}
                 </ul>
-                <Button className={cn("w-full", plan.popular ? "bg-white text-black hover:bg-white/90" : "border-white/10 hover:bg-white/5")} variant={plan.popular ? "default" : "outline"}>
+                <Button
+                  className={cn(
+                    "w-full",
+                    plan.popular
+                      ? "bg-violet-600 text-white hover:bg-violet-700"
+                      : "bg-white/5 hover:bg-white/10 text-white"
+                  )}
+                >
                   Get started
                 </Button>
-              </motion.div>)}
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -384,14 +364,14 @@ const Index = () => {
       <section className="py-20 border-t border-white/10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} className="text-center mb-12">
+            opacity: 0,
+            y: 20
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
             <p className="text-gray-400">Everything you need to know about our AI voice agents</p>
           </motion.div>
@@ -412,14 +392,14 @@ const Index = () => {
       <section className="py-20 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} className="text-center">
+            opacity: 0,
+            y: 20
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} className="text-center">
             <h2 className="text-2xl font-semibold text-white mb-12">Trusted by Industry Leaders</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
               <div className="flex items-center justify-center">
