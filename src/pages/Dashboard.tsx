@@ -1,27 +1,13 @@
+
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { 
-  LayoutDashboard, 
-  Settings, 
-  Users, 
-  Bell, 
-  Phone, 
-  Calendar, 
-  Database, 
-  Languages, 
-  Bot, 
-  FileText, 
-  Search,
-  ChevronDown,
-  ArrowUpRight,
-  BarChart3,
-  TrendingUp,
-  Clock,
-  Key,
-  Shield,
-  LogOut
+  LayoutDashboard, Settings, Users, Bell, Phone, Calendar, 
+  Database, Languages, Bot, FileText, Search, ChevronDown,
+  ArrowUpRight, BarChart3, TrendingUp, Clock, Key, Shield, 
+  LogOut, Mic, MessageCircle, VoiceIcon, Activity
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -51,19 +36,113 @@ const Dashboard = () => {
     }
   };
 
-  const handlePageChange = (page: string) => {
-    setCurrentPage(page);
-  };
+  const renderDashboardContent = () => (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-violet-500/5 backdrop-blur-xl border border-violet-500/10 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-white">Total Calls</h3>
+            <Phone className="text-violet-400 h-5 w-5" />
+          </div>
+          <p className="text-3xl font-bold text-white">1,234</p>
+          <p className="text-sm text-violet-200/70 mt-2">+12% from last month</p>
+        </div>
+        <div className="bg-violet-500/5 backdrop-blur-xl border border-violet-500/10 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-white">Active Agents</h3>
+            <Bot className="text-violet-400 h-5 w-5" />
+          </div>
+          <p className="text-3xl font-bold text-white">25</p>
+          <p className="text-sm text-violet-200/70 mt-2">Currently online</p>
+        </div>
+        <div className="bg-violet-500/5 backdrop-blur-xl border border-violet-500/10 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-white">Minutes Used</h3>
+            <Clock className="text-violet-400 h-5 w-5" />
+          </div>
+          <p className="text-3xl font-bold text-white">4,321</p>
+          <p className="text-sm text-violet-200/70 mt-2">This billing cycle</p>
+        </div>
+        <div className="bg-violet-500/5 backdrop-blur-xl border border-violet-500/10 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-white">Success Rate</h3>
+            <Activity className="text-violet-400 h-5 w-5" />
+          </div>
+          <p className="text-3xl font-bold text-white">95%</p>
+          <p className="text-sm text-violet-200/70 mt-2">Average completion rate</p>
+        </div>
+      </div>
 
-  const handleManageAccount = () => {
-    window.location.href = `https://accounts.clerk.dev/user/`;
-  };
+      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+        <h2 className="text-xl font-semibold text-white mb-6">Live Calls</h2>
+        <div className="space-y-4">
+          {[1, 2, 3].map((call) => (
+            <div key={call} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div className="flex items-center gap-4">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div>
+                  <p className="text-white font-medium">Customer Service Call #{call}</p>
+                  <p className="text-sm text-gray-400">Duration: 5:23</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" className="text-violet-400 hover:text-violet-300">
+                View Details
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAnalyticsContent = () => (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+          <h3 className="text-lg font-medium text-white mb-4">Call Volume Trends</h3>
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-gray-400">Chart visualization coming soon...</p>
+          </div>
+        </div>
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+          <h3 className="text-lg font-medium text-white mb-4">Agent Performance</h3>
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-gray-400">Performance metrics coming soon...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCallLogsContent = () => (
+    <div className="space-y-6">
+      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+        <h2 className="text-xl font-semibold text-white mb-6">Recent Calls</h2>
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((call) => (
+            <div key={call} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Call #{call}</p>
+                <p className="text-sm text-gray-400">Today at 2:30 PM</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-400">Duration: 12:34</span>
+                <Button variant="ghost" size="sm" className="text-violet-400 hover:text-violet-300">
+                  View Recording
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#0A0A0B]">
       <div className="flex min-h-screen">
-        {/* Glassmorphic Sidebar */}
-        <div className="w-64 bg-black/40 backdrop-blur-xl border-r border-white/10">
+        {/* Sidebar with violet glassmorphism */}
+        <div className="w-64 bg-violet-500/5 backdrop-blur-xl border-r border-violet-500/10">
           <div className="p-6">
             <h1 className="text-xl font-bold text-white mb-8">Magic UI</h1>
             <nav className="space-y-2">
@@ -73,7 +152,7 @@ const Dashboard = () => {
                   "w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10 transition-all",
                   currentPage === 'dashboard' && "bg-violet-500/10 text-violet-400"
                 )}
-                onClick={() => handlePageChange('dashboard')}
+                onClick={() => setCurrentPage('dashboard')}
               >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 Dashboard
@@ -84,7 +163,7 @@ const Dashboard = () => {
                   "w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10",
                   currentPage === 'analytics' && "bg-violet-500/10 text-violet-400"
                 )}
-                onClick={() => handlePageChange('analytics')}
+                onClick={() => setCurrentPage('analytics')}
               >
                 <BarChart3 className="mr-2 h-4 w-4" />
                 Analytics
@@ -95,38 +174,10 @@ const Dashboard = () => {
                   "w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10",
                   currentPage === 'calls' && "bg-violet-500/10 text-violet-400"
                 )}
-                onClick={() => handlePageChange('calls')}
+                onClick={() => setCurrentPage('calls')}
               >
                 <Phone className="mr-2 h-4 w-4" />
                 Call Logs
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Bot className="mr-2 h-4 w-4" />
-                Agent Performance
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Calendar className="mr-2 h-4 w-4" />
-                Appointments
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Database className="mr-2 h-4 w-4" />
-                CRM Sync
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Languages className="mr-2 h-4 w-4" />
-                Languages
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Settings className="mr-2 h-4 w-4" />
-                AI Settings
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <Bell className="mr-2 h-4 w-4" />
-                Notifications
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10">
-                <FileText className="mr-2 h-4 w-4" />
-                Reports
               </Button>
             </nav>
           </div>
@@ -134,8 +185,8 @@ const Dashboard = () => {
 
         {/* Main content */}
         <div className="flex-1 overflow-auto">
-          {/* Top Navigation Bar */}
-          <header className="bg-black/40 border-b border-white/10 backdrop-blur-xl sticky top-0 z-10">
+          {/* Top Navigation Bar with violet glassmorphism */}
+          <header className="bg-violet-500/5 border-b border-violet-500/10 backdrop-blur-xl sticky top-0 z-10">
             <div className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center gap-4 flex-1">
                 <div className="relative flex-1 max-w-md">
@@ -143,37 +194,37 @@ const Dashboard = () => {
                   <input
                     type="text"
                     placeholder="Search calls, leads, settings..."
-                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    className="w-full bg-white/5 border border-violet-500/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
                   />
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon" className="rounded-lg">
                     <Bell className="h-5 w-5 text-gray-400" />
                   </Button>
-                  <div className="h-8 w-px bg-white/10" />
+                  <div className="h-8 w-px bg-violet-500/10" />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="gap-2">
-                        <div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
                           {user?.firstName?.[0]}
                         </div>
                         <span className="text-sm text-white">{user?.firstName}</span>
                         <ChevronDown className="h-4 w-4 text-gray-400" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent align="end" className="w-56 bg-violet-500/5 backdrop-blur-xl border-violet-500/10">
                       <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleManageAccount} className="cursor-pointer">
+                      <DropdownMenuSeparator className="bg-violet-500/10" />
+                      <DropdownMenuItem className="hover:bg-violet-500/10 cursor-pointer">
                         <Shield className="mr-2 h-4 w-4" />
                         <span>Account Settings</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleManageAccount} className="cursor-pointer">
+                      <DropdownMenuItem className="hover:bg-violet-500/10 cursor-pointer">
                         <Key className="mr-2 h-4 w-4" />
                         <span>Change Password</span>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500">
+                      <DropdownMenuSeparator className="bg-violet-500/10" />
+                      <DropdownMenuItem onClick={handleSignOut} className="hover:bg-red-500/10 cursor-pointer text-red-400">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sign out</span>
                       </DropdownMenuItem>
@@ -185,150 +236,9 @@ const Dashboard = () => {
           </header>
 
           <main className="p-8">
-            {currentPage === 'dashboard' && (
-              <>
-                {/* Analytics Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-2 bg-violet-500/10 rounded-lg">
-                        <Phone className="h-5 w-5 text-violet-400" />
-                      </div>
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-400">Total Calls</h3>
-                    <p className="text-2xl font-bold text-white mt-1">1,234</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <ArrowUpRight className="h-3 w-3 text-green-400" />
-                      <span className="text-xs text-green-400">+12.5%</span>
-                      <span className="text-xs text-gray-400 ml-1">vs last week</span>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-2 bg-violet-500/10 rounded-lg">
-                        <Bot className="h-5 w-5 text-violet-400" />
-                      </div>
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-400">Response Rate</h3>
-                    <p className="text-2xl font-bold text-white mt-1">98.5%</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <ArrowUpRight className="h-3 w-3 text-green-400" />
-                      <span className="text-xs text-green-400">+2.1%</span>
-                      <span className="text-xs text-gray-400 ml-1">vs last week</span>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-2 bg-violet-500/10 rounded-lg">
-                        <Clock className="h-5 w-5 text-violet-400" />
-                      </div>
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-400">Avg. Call Time</h3>
-                    <p className="text-2xl font-bold text-white mt-1">2m 45s</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <ArrowUpRight className="h-3 w-3 text-green-400" />
-                      <span className="text-xs text-green-400">-8.3%</span>
-                      <span className="text-xs text-gray-400 ml-1">vs last week</span>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-2 bg-violet-500/10 rounded-lg">
-                        <Users className="h-5 w-5 text-violet-400" />
-                      </div>
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-400">Active Agents</h3>
-                    <p className="text-2xl font-bold text-white mt-1">12</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <ArrowUpRight className="h-3 w-3 text-green-400" />
-                      <span className="text-xs text-green-400">+1</span>
-                      <span className="text-xs text-gray-400 ml-1">vs last week</span>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Live Calls Section */}
-                <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6 mb-8">
-                  <h2 className="text-lg font-semibold text-white mb-4">Live Calls</h2>
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((call) => (
-                      <div key={call} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                          <div>
-                            <h3 className="text-sm font-medium text-white">Call #{call}</h3>
-                            <p className="text-xs text-gray-400">Duration: 1:23</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6">
-                  <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
-                  <div className="space-y-4">
-                    {[1, 2, 3, 4].map((activity) => (
-                      <div key={activity} className="flex items-center gap-4 p-4 bg-white/5 rounded-lg">
-                        <div className="p-2 bg-violet-500/10 rounded-lg">
-                          <Phone className="h-4 w-4 text-violet-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-medium text-white">New call completed</h3>
-                          <p className="text-xs text-gray-400">2 minutes ago</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {currentPage === 'analytics' && (
-              <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-white mb-4">Analytics</h2>
-                <p className="text-gray-400">Detailed analytics coming soon...</p>
-              </div>
-            )}
-
-            {currentPage === 'calls' && (
-              <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-white mb-4">Call Logs</h2>
-                <p className="text-gray-400">Call history coming soon...</p>
-              </div>
-            )}
+            {currentPage === 'dashboard' && renderDashboardContent()}
+            {currentPage === 'analytics' && renderAnalyticsContent()}
+            {currentPage === 'calls' && renderCallLogsContent()}
           </main>
         </div>
       </div>

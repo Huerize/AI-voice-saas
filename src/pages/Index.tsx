@@ -48,7 +48,7 @@ const Index = () => {
     description: "Enterprise-grade security with end-to-end encryption and compliance certifications.",
     className: "col-span-2",
     background: <div className="absolute inset-0 flex items-center justify-center opacity-10">
-          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-2xl" />
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 blur-2xl" />
         </div>
   }, {
     Icon: LayoutDashboard,
@@ -56,7 +56,7 @@ const Index = () => {
     description: "Organize and manage calls efficiently with our intuitive dashboard interface.",
     className: "col-span-1",
     background: <div className="absolute inset-0 flex items-center justify-center opacity-10">
-          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 blur-2xl" />
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 blur-2xl" />
         </div>
   }, {
     Icon: FileText,
@@ -138,7 +138,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] overflow-hidden">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/10">
+      {/* Header with violet glassmorphism */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-violet-500/5 backdrop-blur-xl border-b border-violet-500/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -149,21 +150,21 @@ const Index = () => {
                 <DropdownMenuTrigger className="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
                   Features <ChevronDown className="w-4 h-4" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Voice Recognition</DropdownMenuItem>
-                  <DropdownMenuItem>AI Agents</DropdownMenuItem>
-                  <DropdownMenuItem>Analytics</DropdownMenuItem>
-                  <DropdownMenuItem>Integrations</DropdownMenuItem>
+                <DropdownMenuContent className="bg-violet-500/5 backdrop-blur-xl border-violet-500/10">
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Voice Recognition</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-violet-500/10">AI Agents</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Analytics</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Integrations</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger className="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
                   Solutions <ChevronDown className="w-4 h-4" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Enterprise</DropdownMenuItem>
-                  <DropdownMenuItem>Small Business</DropdownMenuItem>
-                  <DropdownMenuItem>Startups</DropdownMenuItem>
+                <DropdownMenuContent className="bg-violet-500/5 backdrop-blur-xl border-violet-500/10">
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Enterprise</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Small Business</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-violet-500/10">Startups</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
@@ -270,6 +271,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Features section with violet glassmorphism */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
@@ -278,92 +280,29 @@ const Index = () => {
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <motion.div initial={{
-            opacity: 0,
-            y: 20
-          }} whileInView={{
-            opacity: 1,
-            y: 0
-          }} viewport={{
-            once: true
-          }} className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Simple, transparent pricing</h2>
-            <p className="text-gray-400 mb-8">Start building with AI voice agents today</p>
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <Label htmlFor="billing-toggle" className="text-sm text-gray-400">Monthly</Label>
-              <Switch
-                id="billing-toggle"
-                checked={isYearly}
-                onCheckedChange={setIsYearly}
-                className="data-[state=checked]:bg-violet-600"
-              />
-              <Label htmlFor="billing-toggle" className="text-sm text-gray-400">
-                Yearly
-                <span className="ml-2 text-xs text-violet-400">(Save 20%)</span>
-              </Label>
-            </div>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingTiers.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                initial={{
-                  opacity: 0,
-                  y: 20
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0
-                }}
-                viewport={{
-                  once: true
-                }}
-                transition={{
-                  delay: i * 0.1
-                }}
+          <BentoGrid className="gap-4">
+            {features.map((feature, i) => (
+              <BentoCard
+                key={feature.name}
+                {...feature}
                 className={cn(
-                  "relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-8 hover:border-violet-500/50 transition-colors",
-                  plan.popular && "border-violet-500/50 shadow-lg shadow-violet-500/20"
+                  "backdrop-blur-xl bg-violet-500/5 border-violet-500/10 hover:border-violet-500/20",
+                  feature.className
                 )}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-violet-600 text-white text-sm rounded-full">
-                    Most Popular
-                  </div>
-                )}
-                <h3 className="text-xl font-semibold text-white mb-4">{plan.name}</h3>
-                <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
-                  {plan.period && <span className="text-gray-400">{plan.period}</span>}
-                  <p className="text-sm text-gray-400 mt-2">{plan.description}</p>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center text-gray-300">
-                      <Check className="w-5 h-5 text-violet-400 mr-2 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className={cn(
-                    "w-full",
-                    plan.popular
-                      ? "bg-violet-600 text-white hover:bg-violet-700"
-                      : "bg-white/5 hover:bg-white/10 text-white"
-                  )}
-                >
-                  Get started
-                </Button>
-              </motion.div>
+              />
             ))}
-          </div>
+          </BentoGrid>
         </div>
       </section>
 
-      <section className="py-20 border-t border-white/10">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* FAQ section with violet glassmorphism */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-20" />
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div initial={{
             opacity: 0,
             y: 20
@@ -378,14 +317,20 @@ const Index = () => {
           </motion.div>
 
           <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, i) => <AccordionItem key={i} value={`item-${i}`} className="glass-card border-none">
-                <AccordionTrigger className="text-lg font-semibold text-white px-6">
+            {faqs.map((faq, i) => (
+              <AccordionItem 
+                key={i} 
+                value={`item-${i}`} 
+                className="backdrop-blur-xl bg-violet-500/5 border border-violet-500/10 rounded-lg overflow-hidden"
+              >
+                <AccordionTrigger className="text-lg font-semibold text-white px-6 hover:bg-violet-500/10">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-gray-400 px-6 pb-4">
                   {faq.answer}
                 </AccordionContent>
-              </AccordionItem>)}
+              </AccordionItem>
+            ))}
           </Accordion>
         </div>
       </section>
@@ -420,56 +365,57 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-12 bg-gradient-to-b from-transparent to-violet-500/5">
+      {/* Footer with violet glassmorphism */}
+      <footer className="border-t border-violet-500/10 py-12 bg-gradient-to-b from-transparent to-violet-500/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <h4 className="text-white font-semibold mb-4">Product</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">API</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Features</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Pricing</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Documentation</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">API</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">About</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Blog</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Careers</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Contact</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Community</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Partners</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Status</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Community</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Help Center</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Partners</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Status</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Compliance</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Privacy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Terms</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Security</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">Compliance</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between">
+          <div className="mt-12 pt-8 border-t border-violet-500/10 flex flex-col md:flex-row items-center justify-between">
             <p className="text-gray-400">© 2024 VoiceAI. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
                 Twitter
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
                 GitHub
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-violet-400 transition-colors">
                 LinkedIn
               </a>
             </div>
