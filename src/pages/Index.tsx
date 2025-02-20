@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Bell, Share2, Repeat, Clock, ChevronRight, Shield, LayoutDashboard, FileText, Mic2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
