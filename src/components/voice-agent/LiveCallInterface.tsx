@@ -8,6 +8,7 @@ import VoiceSelector from './VoiceSelector';
 import { hasRequiredKeys } from '@/services/configService';
 import * as callControllerService from '@/services/callControllerService';
 import { UID } from 'agora-rtc-sdk-ng';
+import ConversationStatus from './ConversationStatus';
 
 interface LiveCallInterfaceProps {
   onCallStatusChange?: (isActive: boolean) => void;
@@ -34,6 +35,9 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
   
   // Check if the necessary API keys are configured
   const areApiKeysConfigured = hasRequiredKeys('agora') && hasRequiredKeys('elevenLabs') && hasRequiredKeys('deepgram');
+  
+  // Add new state for last response
+  const [lastResponse, setLastResponse] = useState<string>('');
   
   // Handle starting a call
   const handleStartCall = async () => {
@@ -259,18 +263,24 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
               <div className="flex items-center">
                 <h3 className="text-white text-sm font-medium">Conversation</h3>
                 <div className="ml-auto text-xs text-gray-400">
-                  {transcript && !isAgentSpeaking ? 'Listening...' : ''}
+                  {isAgentSpeaking ? 'AI is speaking...' : transcript ? 'Listening...' : ''}
                 </div>
               </div>
               
-              <div className="bg-black/30 rounded-lg p-4 h-48 overflow-y-auto flex flex-col gap-3">
+              <div className="bg-black/30 rounded-lg p-4 h-48 overflow-y-auto">
+                <ConversationStatus
+                  isAgentSpeaking={isAgentSpeaking}
+                  transcript={transcript}
+                  lastResponse={lastResponse}
+                />
+                
                 {conversationHistory.map((message, index) => (
                   <div 
                     key={index}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`mt-3 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
                   >
                     <div 
-                      className={`rounded-lg px-3 py-2 max-w-[80%] ${
+                      className={`inline-block rounded-lg px-3 py-2 max-w-[80%] ${
                         message.role === 'user' 
                           ? 'bg-violet-600/30 text-white'
                           : 'bg-white/10 text-gray-200'
@@ -280,14 +290,6 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
                     </div>
                   </div>
                 ))}
-                
-                {transcript && !isAgentSpeaking && (
-                  <div className="flex justify-end">
-                    <div className="rounded-lg px-3 py-2 max-w-[80%] bg-violet-600/10 text-gray-400 italic">
-                      {transcript}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

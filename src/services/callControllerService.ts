@@ -23,6 +23,8 @@ export interface CallControllerConfig {
 let isCallActive = false;
 let currentConfig: CallControllerConfig | null = null;
 let latestTranscript = '';
+let isAgentProcessing = false;
+let conversationContext: string[] = [];
 
 // Initialize and start a call
 export const startCall = async (config: CallControllerConfig): Promise<boolean> => {
@@ -56,17 +58,16 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
     
     // Initialize STT for speech recognition
     const sttInitialized = await sttService.initializeSTT({
-      onTranscript: (transcript, isFinal) => {
+      onTranscript: async (transcript, isFinal) => {
         latestTranscript = transcript;
         
         if (config.onTranscriptReceived) {
           config.onTranscriptReceived(transcript, isFinal);
         }
         
-        // If final transcript, we could trigger AI response here
-        if (isFinal && transcript.trim()) {
-          // This would integrate with an AI service in the future
-          // processAIResponse(transcript);
+        // Process final transcripts for AI response
+        if (isFinal && transcript.trim() && !isAgentProcessing) {
+          await processUserInput(transcript);
         }
       },
       onError: (error) => {
@@ -193,6 +194,64 @@ export const isCallInProgress = (): boolean => {
 // Get the latest transcript
 export const getLatestTranscript = (): string => {
   return latestTranscript;
+};
+
+// Process user input and generate AI response
+const processUserInput = async (userInput: string): Promise<void> => {
+  if (!currentConfig || !isCallActive || isAgentProcessing) return;
+
+  try {
+    isAgentProcessing = true;
+    
+    if (currentConfig.onAgentSpeaking) {
+      currentConfig.onAgentSpeaking(true);
+    }
+
+    // Store context for conversation flow
+    conversationContext.push(`User: ${userInput}`);
+    
+    // For now, we'll use a simple echo response
+    // In a real implementation, this would call an AI service
+    const response = generateSimpleResponse(userInput);
+    
+    // Store agent response in context
+    conversationContext.push(`Agent: ${response}`);
+    
+    // Keep context window manageable
+    if (conversationContext.length > 10) {
+      conversationContext = conversationContext.slice(-10);
+    }
+    
+    await sendAgentResponse(response);
+
+  } catch (error) {
+    console.error('Error processing user input:', error);
+    if (currentConfig.onError) {
+      currentConfig.onError(error as Error);
+    }
+  } finally {
+    isAgentProcessing = false;
+    if (currentConfig.onAgentSpeaking) {
+      currentConfig.onAgentSpeaking(false);
+    }
+  }
+};
+
+// Simple response generator (placeholder for AI service)
+const generateSimpleResponse = (userInput: string): string => {
+  const lowercaseInput = userInput.toLowerCase();
+  
+  if (lowercaseInput.includes('hello') || lowercaseInput.includes('hi')) {
+    return "Hello! How can I assist you today?";
+  } else if (lowercaseInput.includes('bye') || lowercaseInput.includes('goodbye')) {
+    return "Goodbye! Have a great day!";
+  } else if (lowercaseInput.includes('thank')) {
+    return "You're welcome! Is there anything else I can help you with?";
+  } else if (lowercaseInput.includes('help')) {
+    return "I'm here to help! What would you like to know?";
+  } else {
+    return `I understand you said: "${userInput}". How can I help you with that?`;
+  }
 };
 
 export default {
