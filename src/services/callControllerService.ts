@@ -17,6 +17,11 @@ export interface CallControllerConfig {
   collegeContext?: string;
   courseName?: string;
   
+  // Conversational AI settings
+  contextWindow?: number;
+  temperature?: number;
+  maxTokens?: number;
+  
   // Event handlers
   onCallConnected?: () => void;
   onCallEnded?: () => void;
@@ -40,6 +45,11 @@ interface ActiveCall {
   isAgentProcessing: boolean;
   conversationContext: string[];
   startTime: Date;
+  settings: {
+    contextWindow: number;
+    temperature: number;
+    maxTokens: number;
+  };
 }
 
 // Call controller state
@@ -57,10 +67,18 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
       await endCallById(callId);
     }
     
+    // Store conversation settings
+    const callSettings = {
+      contextWindow: config.contextWindow || 5,
+      temperature: config.temperature || 0.7,
+      maxTokens: config.maxTokens || 1000
+    };
+    
     // Initialize Agora for voice communication
     const agoraInitialized = await agoraService.joinCall({
       channelName: config.channelName,
       uid: Date.now(),
+      role: 'host',
       onUserJoined: (user) => {
         console.log('Remote user joined:', user);
       },
@@ -110,7 +128,7 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
       throw new Error('Failed to initialize speech recognition');
     }
     
-    // Store the call information
+    // Store the call information with enhanced settings
     activeCalls.set(callId, {
       channelName: config.channelName,
       voiceId: config.voiceId,
@@ -118,7 +136,8 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
       transcript: '',
       isAgentProcessing: false,
       conversationContext: [],
-      startTime: new Date()
+      startTime: new Date(),
+      settings: callSettings
     });
     
     currentCallId = callId;
