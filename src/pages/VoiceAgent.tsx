@@ -25,6 +25,7 @@ import CallStatsPanel from "@/components/voice-agent/CallStatsPanel";
 import RecentTranscriptsPanel from "@/components/voice-agent/RecentTranscriptsPanel";
 import ApiKeysForm from "@/components/voice-agent/ApiKeysForm";
 import VoiceTester from "@/components/voice-agent/VoiceTester";
+import LiveCallInterface from "@/components/voice-agent/LiveCallInterface";
 import { hasRequiredKeys } from "@/services/configService";
 
 const VoiceAgent = () => {
@@ -48,22 +49,8 @@ const VoiceAgent = () => {
     });
   }, [currentPage]);
 
-  const handleMakeCall = () => {
-    if (!configComplete.agora || !configComplete.elevenLabs) {
-      toast.error("Missing required API keys", {
-        description: "Please configure Agora and ElevenLabs API keys in Settings"
-      });
-      setCurrentPage('settings');
-      return;
-    }
-
-    setIsCallActive(true);
-    toast.success("Call initiated successfully");
-  };
-
-  const handleEndCall = () => {
-    setIsCallActive(false);
-    toast.info("Call ended");
+  const handleCallStatusChange = (isActive: boolean) => {
+    setIsCallActive(isActive);
   };
 
   const renderDashboardContent = () => (
@@ -128,23 +115,14 @@ const VoiceAgent = () => {
                   callId="CS-12345"
                   duration="02:45"
                   agentName="Customer Service Bot"
-                  onEndCall={handleEndCall}
+                  onEndCall={() => setIsCallActive(false)}
                 />
                 <div className="p-4 bg-white/5 rounded-lg">
                   <AudioVisualizer isActive={true} />
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center p-8 bg-white/5 rounded-lg">
-                <Phone className="h-12 w-12 text-violet-400 mb-4" />
-                <p className="text-white text-lg mb-4">No active calls</p>
-                <Button 
-                  onClick={handleMakeCall}
-                  className="bg-violet-600 hover:bg-violet-700"
-                >
-                  <Phone className="mr-2 h-4 w-4" /> Start Test Call
-                </Button>
-              </div>
+              <LiveCallInterface onCallStatusChange={handleCallStatusChange} />
             )}
           </div>
         </div>

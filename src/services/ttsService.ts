@@ -1,82 +1,240 @@
 
-// ElevenLabs TTS Service
+import { toast } from 'sonner';
 import { getApiKeys } from './configService';
 
-// Available voices with their ElevenLabs voice IDs
-export const availableVoices = [
-  { name: 'Aria', id: '9BWtsMINqrJLrRacOk9x', gender: 'female' },
-  { name: 'Roger', id: 'CwhRBWXzGAHq8TQ4Fs17', gender: 'male' },
-  { name: 'Sarah', id: 'EXAVITQu4vr4xnSDxMaL', gender: 'female' },
-  { name: 'Charlie', id: 'IKne3meq5aSn9XLyUdCD', gender: 'male' },
-  { name: 'George', id: 'JBFqnCBsd6RMkjVDRZzb', gender: 'male' },
-  { name: 'River', id: 'SAz9YHcvj6GT2YYXdXww', gender: 'female' },
-  { name: 'Daniel', id: 'onwK4e9ZLuTAKqWW03F9', gender: 'male' },
-  { name: 'Lily', id: 'pFZP5JQG7iQjIQuC4Bku', gender: 'female' }
+// Voice data types
+export interface Voice {
+  id: string;
+  name: string;
+  gender: 'male' | 'female';
+}
+
+// Available voices in ElevenLabs
+export const availableVoices: Voice[] = [
+  { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger', gender: 'male' },
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', gender: 'female' },
+  { id: '9BWtsMINqrJLrRacOk9x', name: 'Aria', gender: 'female' },
+  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura', gender: 'female' },
+  { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie', gender: 'male' },
+  { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', gender: 'male' },
+  { id: 'N2lVS1w4EtoT3dr4eOWO', name: 'Callum', gender: 'male' },
+  { id: 'XB0fDUnXU5powFXDhCwa', name: 'Charlotte', gender: 'female' },
 ];
 
-// Default settings for TTS requests
-const defaultSettings = {
-  model_id: 'eleven_multilingual_v2',
-  voice_settings: {
-    stability: 0.5,
-    similarity_boost: 0.75,
-    style: 0.0,
-    use_speaker_boost: true
-  }
+// Audio player instance for playing TTS audio
+let audioPlayer: HTMLAudioElement | null = null;
+let isPlaying = false;
+
+// TTS configuration
+interface TTSConfig {
+  model?: string;
+  voiceId?: string;
+  optimizeStreamingLatency?: number; // 0-4, 0 being lowest latency
+}
+
+const defaultConfig: TTSConfig = {
+  model: 'eleven_turbo_v2',
+  voiceId: 'CwhRBWXzGAHq8TQ4Fs17', // Roger
+  optimizeStreamingLatency: 3
 };
 
-// Synthesize text to speech using ElevenLabs API
+// Synthesize speech from text
 export const synthesizeSpeech = async (
-  text: string,
-  voiceId: string = 'CwhRBWXzGAHq8TQ4Fs17' // Default to Roger voice
+  text: string, 
+  voiceId: string = defaultConfig.voiceId!,
+  model: string = defaultConfig.model!
 ): Promise<ArrayBuffer | null> => {
-  const { elevenLabsApiKey } = getApiKeys();
-  
-  if (!elevenLabsApiKey) {
-    console.error('ElevenLabs API key not set');
-    return null;
-  }
-
   try {
+    const { elevenLabsApiKey } = getApiKeys();
+    
+    if (!elevenLabsApiKey) {
+      toast.error('ElevenLabs API key is not configured');
+      return null;
+    }
+    
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: 'POST',
         headers: {
-          'xi-api-key': elevenLabsApiKey,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'xi-api-key': elevenLabsApiKey
         },
         body: JSON.stringify({
           text,
-          ...defaultSettings
+          model_id: model,
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75
+          }
         })
       }
     );
-
+    
     if (!response.ok) {
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`ElevenLabs API error: ${errorText}`);
     }
-
+    
     return await response.arrayBuffer();
+    
   } catch (error) {
-    console.error('TTS synthesis failed:', error);
+    console.error('Error synthesizing speech:', error);
+    toast.error(`Failed to synthesize speech: ${(error as Error).message}`);
     return null;
   }
 };
 
 // Play audio from ArrayBuffer
 export const playAudio = async (audioData: ArrayBuffer): Promise<void> => {
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const audioBuffer = await audioContext.decodeAudioData(audioData);
+  try {
+    if (isPlaying && audioPlayer) {
+      audioPlayer.pause();
+    }
+    
+    const blob = new Blob([audioData], { type: 'audio/mpeg' });
+    const url = URL.createObjectURL(blob);
+    
+    audioPlayer = new Audio(url);
+    
+    audioPlayer.onplay = () => {
+      isPlaying = true;
+    };
+    
+    audioPlayer.onended = () => {
+      isPlaying = false;
+      URL.revokeObjectURL(url);
+    };
+    
+    audioPlayer.onerror = () => {
+      isPlaying = false;
+      URL.revokeObjectURL(url);
+      toast.error('Error playing audio');
+    };
+    
+    await audioPlayer.play();
+    
+  } catch (error) {
+    console.error('Error playing audio:', error);
+    toast.error(`Failed to play audio: ${(error as Error).message}`);
+  }
+};
+
+// Stream speech synthesis (more efficient for longer texts)
+export const streamSpeech = async (
+  text: string,
+  voiceId: string = defaultConfig.voiceId!,
+  model: string = defaultConfig.model!,
+  onDataReceived?: (audioChunk: ArrayBuffer) => void
+): Promise<boolean> => {
+  try {
+    const { elevenLabsApiKey } = getApiKeys();
+    
+    if (!elevenLabsApiKey) {
+      toast.error('ElevenLabs API key is not configured');
+      return false;
+    }
+    
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': elevenLabsApiKey
+        },
+        body: JSON.stringify({
+          text,
+          model_id: model,
+          optimize_streaming_latency: defaultConfig.optimizeStreamingLatency,
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75
+          }
+        })
+      }
+    );
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`ElevenLabs streaming API error: ${errorText}`);
+    }
+    
+    const reader = response.body!.getReader();
+    
+    // Process the stream
+    const processStream = async () => {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          if (onDataReceived) {
+            onDataReceived(value.buffer);
+          } else {
+            // Default behavior: play audio chunks as they arrive
+            await playAudioChunk(value.buffer);
+          }
+        }
+        return true;
+      } catch (error) {
+        console.error('Error processing speech stream:', error);
+        return false;
+      }
+    };
+    
+    return await processStream();
+    
+  } catch (error) {
+    console.error('Error streaming speech:', error);
+    toast.error(`Failed to stream speech: ${(error as Error).message}`);
+    return false;
+  }
+};
+
+// Helper function to play a single audio chunk
+const playAudioChunk = async (chunk: ArrayBuffer): Promise<void> => {
+  const blob = new Blob([chunk], { type: 'audio/mpeg' });
+  const url = URL.createObjectURL(blob);
   
-  const source = audioContext.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(audioContext.destination);
-  source.start(0);
+  const audio = new Audio(url);
+  
+  audio.onended = () => {
+    URL.revokeObjectURL(url);
+  };
+  
+  audio.onerror = () => {
+    URL.revokeObjectURL(url);
+  };
+  
+  await audio.play();
+};
+
+// Stop current audio playback
+export const stopAudio = (): void => {
+  if (audioPlayer && isPlaying) {
+    audioPlayer.pause();
+    audioPlayer = null;
+    isPlaying = false;
+  }
+};
+
+// Check if audio is currently playing
+export const isAudioPlaying = (): boolean => {
+  return isPlaying;
+};
+
+// Get a voice by ID
+export const getVoiceById = (id: string): Voice | undefined => {
+  return availableVoices.find(voice => voice.id === id);
 };
 
 export default {
-  availableVoices,
   synthesizeSpeech,
-  playAudio
+  playAudio,
+  streamSpeech,
+  stopAudio,
+  isAudioPlaying,
+  availableVoices,
+  getVoiceById
 };
