@@ -7,7 +7,7 @@ import {
   Phone, Bot, Mic, 
   Calendar, TrendingUp, Clock, Activity,
   Search, Bell, Shield, User, Settings,
-  Database, MessageCircle, Sparkles, Link
+  Database, MessageCircle, Sparkles, Link, Sliders
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -34,6 +34,8 @@ import LLMSelector from "@/components/voice-agent/LLMSelector";
 import SystemPromptEditor from "@/components/voice-agent/SystemPromptEditor";
 import WebhookSetup from "@/components/voice-agent/WebhookSetup";
 import { hasRequiredKeys } from "@/services/configService";
+import { useVoiceAgentSettings } from "@/hooks/useVoiceAgentSettings";
+import VoiceAgentSettings from "@/components/voice-agent/VoiceAgentSettings";
 
 const VoiceAgent = () => {
   const { user } = useUser();
@@ -41,15 +43,15 @@ const VoiceAgent = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [currentSettingsTab, setCurrentSettingsTab] = useState('api-keys');
   const [isCallActive, setIsCallActive] = useState(false);
-  const [selectedLLM, setSelectedLLM] = useState('gpt-4o');
-  const [activeKnowledgeBase, setActiveKnowledgeBase] = useState<string | null>(null);
-  const [systemPrompt, setSystemPrompt] = useState<string | undefined>();
   const [configComplete, setConfigComplete] = useState({
     agora: false,
     deepgram: false,
     elevenLabs: false,
     openAI: false
   });
+
+  // Use the voice agent settings hook
+  const { settings, updateSettings } = useVoiceAgentSettings();
 
   useEffect(() => {
     setConfigComplete({
@@ -65,16 +67,20 @@ const VoiceAgent = () => {
   };
 
   const handleLLMChange = (modelId: string) => {
-    setSelectedLLM(modelId);
+    updateSettings({ selectedLLM: modelId });
     toast.success(`Model changed to ${modelId}`);
   };
 
   const handleKnowledgeBaseChange = (knowledgeBase: string | null) => {
-    setActiveKnowledgeBase(knowledgeBase);
+    updateSettings({ knowledgeBase });
   };
 
   const handleSystemPromptChange = (prompt: string) => {
-    setSystemPrompt(prompt);
+    updateSettings({ systemPrompt: prompt });
+  };
+
+  const handleVoiceAgentSettingChange = (setting: string, value: number) => {
+    updateSettings({ [setting]: value });
   };
 
   const renderDashboardContent = () => (
@@ -152,14 +158,58 @@ const VoiceAgent = () => {
               <LiveCallInterface 
                 onCallStatusChange={handleCallStatusChange} 
                 agentName="College Assistant"
+                selectedLLM={settings.selectedLLM}
+                knowledgeBase={settings.knowledgeBase}
+                systemPrompt={settings.systemPrompt}
               />
             )}
           </div>
         </div>
 
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Agent Status</h2>
-          <AgentStatusPanel />
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-6">
+            <Sliders className="h-5 w-5 text-violet-400" />
+            Agent Settings
+          </h2>
+
+          <div className="space-y-6">
+            <VoiceAgentSettings
+              contextWindow={settings.contextWindow}
+              temperature={settings.temperature}
+              maxTokens={settings.maxTokens}
+              onSettingChange={handleVoiceAgentSettingChange}
+            />
+
+            {settings.selectedLLM && (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs text-amber-300">Using model: {settings.selectedLLM}</span>
+                </div>
+              </div>
+            )}
+            
+            {settings.knowledgeBase && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4 text-emerald-400" />
+                  <span className="text-xs text-emerald-300">Knowledge: {settings.knowledgeBase}</span>
+                </div>
+              </div>
+            )}
+
+            <Button 
+              variant="ghost" 
+              className="w-full text-violet-400 border border-violet-500/20"
+              onClick={() => {
+                setCurrentPage('settings');
+                setCurrentSettingsTab('models');
+              }}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Select LLM Model
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -213,11 +263,11 @@ const VoiceAgent = () => {
         <TabsContent value="models" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LLMSelector 
-              selectedModel={selectedLLM} 
+              selectedModel={settings.selectedLLM} 
               onSelectModel={handleLLMChange} 
             />
             <SystemPromptEditor 
-              initialPrompt={systemPrompt}
+              initialPrompt={settings.systemPrompt}
               onSavePrompt={handleSystemPromptChange}
             />
           </div>

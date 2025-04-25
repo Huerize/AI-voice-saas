@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-interface VoiceAgentSettings {
+export interface VoiceAgentSettings {
   contextWindow: number;
   temperature: number;
   maxTokens: number;
@@ -17,7 +17,7 @@ export const useVoiceAgentSettings = (initialSettings?: Partial<VoiceAgentSettin
     maxTokens: initialSettings?.maxTokens || 1000,
     selectedLLM: initialSettings?.selectedLLM || 'gpt-4o',
     knowledgeBase: initialSettings?.knowledgeBase || null,
-    systemPrompt: initialSettings?.systemPrompt || ''
+    systemPrompt: initialSettings?.systemPrompt || 'You are a helpful AI assistant for a college. You provide information about courses, admissions, campus facilities, and answer student queries in a friendly, professional manner.'
   });
 
   const updateSettings = (newSettings: Partial<VoiceAgentSettings>) => {

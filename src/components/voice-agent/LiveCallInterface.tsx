@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Phone, Mic, MicOff, User, Bot, Database, Sparkles } from "lucide-react";
+import { Phone, Mic, MicOff, User, Bot, Database, Sparkles, Sliders } from "lucide-react";
 import EnhancedAudioVisualizer from './EnhancedAudioVisualizer';
 import VoiceSelector from './VoiceSelector';
 import { hasRequiredKeys } from '@/services/configService';
 import * as callControllerService from '@/services/callControllerService';
 import { UID } from 'agora-rtc-sdk-ng';
 import ConversationStatus from './ConversationStatus';
+import VoiceAgentSettings from './VoiceAgentSettings';
+import { useVoiceAgentSettings } from '@/hooks/useVoiceAgentSettings';
 
 interface Message {
   role: 'user' | 'agent';
@@ -40,6 +42,16 @@ const LiveCallInterface = ({
   courseName,
   systemPrompt
 }: LiveCallInterfaceProps) => {
+  // Voice Agent Settings
+  const { settings, updateSettings } = useVoiceAgentSettings({
+    contextWindow: 5,
+    temperature: 0.7,
+    maxTokens: 1000,
+    selectedLLM: selectedLLM || 'gpt-4o',
+    knowledgeBase: knowledgeBase || null,
+    systemPrompt: systemPrompt || ''
+  });
+
   // Call state
   const [isCallActive, setIsCallActive] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -49,6 +61,7 @@ const LiveCallInterface = ({
   const [callId, setCallId] = useState('');
   const [callDuration, setCallDuration] = useState(0);
   const [callDurationDisplay, setCallDurationDisplay] = useState('00:00');
+  const [showSettings, setShowSettings] = useState(false);
   
   // Transcript state
   const [transcript, setTranscript] = useState('');
@@ -116,11 +129,14 @@ const LiveCallInterface = ({
       const callConfig = {
         channelName: `college-ai-call-${newCallId}`,
         voiceId: selectedVoiceId,
-        llmModel: selectedLLM,
-        knowledgeBase: knowledgeBase,
-        systemPrompt: systemPrompt,
+        llmModel: settings.selectedLLM,
+        knowledgeBase: settings.knowledgeBase,
+        systemPrompt: settings.systemPrompt,
         collegeContext: collegeContext,
         courseName: courseName,
+        contextWindow: settings.contextWindow,
+        temperature: settings.temperature,
+        maxTokens: settings.maxTokens,
         onCallConnected: () => {
           setIsCallActive(true);
           setCallDuration(0);
@@ -212,6 +228,16 @@ const LiveCallInterface = ({
       toast.info(newMuteState ? "Microphone muted" : "Microphone unmuted");
     }
   };
+
+  // Handle voice agent settings changes
+  const handleSettingChange = (setting: string, value: number | string | null) => {
+    updateSettings({ [setting]: value });
+  };
+
+  // Toggle settings visibility
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
+  };
   
   // Clean up on component unmount
   useEffect(() => {
@@ -245,12 +271,33 @@ const LiveCallInterface = ({
               <span className="text-gray-300">Active • {callDurationDisplay}</span>
             </div>
           )}
+
+          {!isCallActive && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={toggleSettings}
+              className="text-gray-400 hover:text-violet-400"
+            >
+              <Sliders className="h-4 w-4" />
+              <span className="ml-1">{showSettings ? 'Hide Settings' : 'Show Settings'}</span>
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
       
       <CardContent className="space-y-6">
         {!isCallActive ? (
           <div className="space-y-6">
+            {showSettings && (
+              <VoiceAgentSettings
+                contextWindow={settings.contextWindow}
+                temperature={settings.temperature}
+                maxTokens={settings.maxTokens}
+                onSettingChange={handleSettingChange}
+              />
+            )}
+
             <div className="space-y-4">
               <label className="text-sm text-gray-300 block">Select Agent Voice</label>
               <VoiceSelector selectedVoiceId={selectedVoiceId} onSelectVoice={setSelectedVoiceId} />
@@ -273,18 +320,18 @@ const LiveCallInterface = ({
               </div>
             )}
             
-            {(selectedLLM || knowledgeBase) && (
+            {(settings.selectedLLM || settings.knowledgeBase) && (
               <div className="flex items-center justify-between bg-black/30 rounded-lg p-3">
-                {selectedLLM && (
+                {settings.selectedLLM && (
                   <div className="flex items-center gap-1">
                     <Sparkles className="h-4 w-4 text-amber-400" />
-                    <span className="text-xs text-amber-300">{selectedLLM}</span>
+                    <span className="text-xs text-amber-300">{settings.selectedLLM}</span>
                   </div>
                 )}
-                {knowledgeBase && (
+                {settings.knowledgeBase && (
                   <div className="flex items-center gap-1">
                     <Database className="h-4 w-4 text-emerald-400" />
-                    <span className="text-xs text-emerald-300">{knowledgeBase}</span>
+                    <span className="text-xs text-emerald-300">{settings.knowledgeBase}</span>
                   </div>
                 )}
               </div>

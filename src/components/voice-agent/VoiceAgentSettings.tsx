@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Settings } from "lucide-react";
+import { Sliders } from "lucide-react";
 
 interface VoiceAgentSettingsProps {
   contextWindow: number;
@@ -22,7 +22,7 @@ const VoiceAgentSettings = ({
     <Card className="bg-black/40 backdrop-blur-xl border border-white/10">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
-          <Settings className="h-5 w-5 text-violet-400" />
+          <Sliders className="h-5 w-5 text-violet-400" />
           Agent Settings
         </CardTitle>
       </CardHeader>
