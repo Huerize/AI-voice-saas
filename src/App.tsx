@@ -8,6 +8,7 @@ import { ClerkProvider, SignIn, SignUp, useUser } from "@clerk/clerk-react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import VoiceAgent from "./pages/VoiceAgent";
 
 const queryClient = new QueryClient();
 const CLERK_PUBLISHABLE_KEY = "pk_test_d29ya2luZy1ld2UtNDIuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -42,6 +43,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/voice-agent" 
+              element={
+                <ProtectedRoute>
+                  <VoiceAgent />
                 </ProtectedRoute>
               } 
             />
