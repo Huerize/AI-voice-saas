@@ -15,25 +15,35 @@ export interface CallControllerConfig {
   onCallEnded?: () => void;
   onTranscriptReceived?: (transcript: string, isFinal: boolean) => void;
   onAgentSpeaking?: (isSpeaking: boolean) => void;
+  onAgentResponse?: (response: string) => void;
   onError?: (error: Error) => void;
   onAudioVolume?: (volumes: {uid: UID, level: number}[]) => void;
 }
 
+interface ActiveCall {
+  channelName: string;
+  voiceId: string;
+  config: CallControllerConfig;
+  transcript: string;
+  isAgentProcessing: boolean;
+  conversationContext: string[];
+  startTime: Date;
+}
+
 // Call controller state
-let isCallActive = false;
-let currentConfig: CallControllerConfig | null = null;
-let latestTranscript = '';
-let isAgentProcessing = false;
-let conversationContext: string[] = [];
+let activeCalls: Map<string, ActiveCall> = new Map();
+let currentCallId: string | null = null;
 
 // Initialize and start a call
 export const startCall = async (config: CallControllerConfig): Promise<boolean> => {
   try {
-    if (isCallActive) {
-      await endCall();
-    }
+    // Generate a unique call ID based on channel name
+    const callId = config.channelName;
     
-    currentConfig = config;
+    // If there's an existing call with this ID, end it first
+    if (activeCalls.has(callId)) {
+      await endCallById(callId);
+    }
     
     // Initialize Agora for voice communication
     const agoraInitialized = await agoraService.joinCall({
@@ -59,15 +69,19 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
     // Initialize STT for speech recognition
     const sttInitialized = await sttService.initializeSTT({
       onTranscript: async (transcript, isFinal) => {
-        latestTranscript = transcript;
+        // Store the latest transcript for this call
+        const activeCall = activeCalls.get(callId);
+        if (activeCall) {
+          activeCall.transcript = transcript;
+        }
         
         if (config.onTranscriptReceived) {
           config.onTranscriptReceived(transcript, isFinal);
         }
         
         // Process final transcripts for AI response
-        if (isFinal && transcript.trim() && !isAgentProcessing) {
-          await processUserInput(transcript);
+        if (isFinal && transcript.trim() && activeCall && !activeCall.isAgentProcessing) {
+          await processUserInput(callId, transcript);
         }
       },
       onError: (error) => {
@@ -84,14 +98,25 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
       throw new Error('Failed to initialize speech recognition');
     }
     
-    isCallActive = true;
+    // Store the call information
+    activeCalls.set(callId, {
+      channelName: config.channelName,
+      voiceId: config.voiceId,
+      config,
+      transcript: '',
+      isAgentProcessing: false,
+      conversationContext: [],
+      startTime: new Date()
+    });
+    
+    currentCallId = callId;
     
     if (config.onCallConnected) {
       config.onCallConnected();
     }
     
     // Send initial greeting
-    await sendAgentResponse("Hello, I'm your AI assistant. How can I help you today?");
+    await sendAgentResponse(callId, "Hello, I'm your AI assistant. How can I help you today?");
     
     return true;
     
@@ -101,8 +126,8 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
     await agoraService.leaveCall();
     sttService.cleanupSTT();
     
-    if (currentConfig?.onError) {
-      currentConfig.onError(error as Error);
+    if (config.onError) {
+      config.onError(error as Error);
     }
     
     toast.error(`Failed to start call: ${(error as Error).message}`);
@@ -112,7 +137,16 @@ export const startCall = async (config: CallControllerConfig): Promise<boolean> 
 
 // End an active call
 export const endCall = async (): Promise<void> => {
-  if (!isCallActive) return;
+  if (currentCallId) {
+    await endCallById(currentCallId);
+  }
+};
+
+// End a specific call by ID
+const endCallById = async (callId: string): Promise<void> => {
+  const activeCall = activeCalls.get(callId);
+  
+  if (!activeCall) return;
   
   try {
     // Stop all services
@@ -120,10 +154,14 @@ export const endCall = async (): Promise<void> => {
     sttService.cleanupSTT();
     ttsService.stopAudio();
     
-    isCallActive = false;
+    if (activeCall.config.onCallEnded) {
+      activeCall.config.onCallEnded();
+    }
     
-    if (currentConfig?.onCallEnded) {
-      currentConfig.onCallEnded();
+    // Remove from active calls
+    activeCalls.delete(callId);
+    if (currentCallId === callId) {
+      currentCallId = null;
     }
     
     toast.info('Call ended');
@@ -134,15 +172,21 @@ export const endCall = async (): Promise<void> => {
   }
 };
 
-// Send an agent response (text-to-speech)
-export const sendAgentResponse = async (text: string): Promise<boolean> => {
-  if (!isCallActive || !currentConfig) {
+// Send an agent response (text-to-speech) for a specific call
+const sendAgentResponse = async (callId: string, text: string): Promise<boolean> => {
+  const activeCall = activeCalls.get(callId);
+  
+  if (!activeCall) {
     return false;
   }
   
   try {
-    if (currentConfig.onAgentSpeaking) {
-      currentConfig.onAgentSpeaking(true);
+    if (activeCall.config.onAgentSpeaking) {
+      activeCall.config.onAgentSpeaking(true);
+    }
+    
+    if (activeCall.config.onAgentResponse) {
+      activeCall.config.onAgentResponse(text);
     }
     
     // Temporarily pause STT while agent is speaking
@@ -151,14 +195,14 @@ export const sendAgentResponse = async (text: string): Promise<boolean> => {
     // Stream the agent's response
     await ttsService.streamSpeech(
       text,
-      currentConfig.voiceId
+      activeCall.voiceId
     );
     
     // Resume STT after speaking
     sttService.startListening();
     
-    if (currentConfig.onAgentSpeaking) {
-      currentConfig.onAgentSpeaking(false);
+    if (activeCall.config.onAgentSpeaking) {
+      activeCall.config.onAgentSpeaking(false);
     }
     
     return true;
@@ -166,15 +210,15 @@ export const sendAgentResponse = async (text: string): Promise<boolean> => {
   } catch (error) {
     console.error('Error sending agent response:', error);
     
-    if (currentConfig?.onError) {
-      currentConfig.onError(error as Error);
+    if (activeCall.config.onError) {
+      activeCall.config.onError(error as Error);
     }
     
     // Resume STT in case of error
     sttService.startListening();
     
-    if (currentConfig?.onAgentSpeaking) {
-      currentConfig.onAgentSpeaking(false);
+    if (activeCall.config.onAgentSpeaking) {
+      activeCall.config.onAgentSpeaking(false);
     }
     
     return false;
@@ -188,77 +232,131 @@ export const toggleMute = (mute: boolean): boolean => {
 
 // Get the current call status
 export const isCallInProgress = (): boolean => {
-  return isCallActive;
+  return currentCallId !== null;
 };
 
-// Get the latest transcript
-export const getLatestTranscript = (): string => {
-  return latestTranscript;
+// Get all active calls
+export const getActiveCalls = (): Map<string, ActiveCall> => {
+  return activeCalls;
+};
+
+// Get call statistics
+export const getCallStatistics = (): { 
+  totalCalls: number; 
+  activeCalls: number;
+  totalDuration: number;
+} => {
+  const now = new Date();
+  
+  // Calculate total duration of all calls
+  let totalDuration = 0;
+  activeCalls.forEach(call => {
+    const callDuration = (now.getTime() - call.startTime.getTime()) / 1000; // seconds
+    totalDuration += callDuration;
+  });
+  
+  return {
+    totalCalls: activeCalls.size,
+    activeCalls: activeCalls.size,
+    totalDuration
+  };
 };
 
 // Process user input and generate AI response
-const processUserInput = async (userInput: string): Promise<void> => {
-  if (!currentConfig || !isCallActive || isAgentProcessing) return;
+const processUserInput = async (callId: string, userInput: string): Promise<void> => {
+  const activeCall = activeCalls.get(callId);
+  
+  if (!activeCall || activeCall.isAgentProcessing) return;
 
   try {
-    isAgentProcessing = true;
+    // Mark as processing to prevent concurrent processing
+    activeCall.isAgentProcessing = true;
     
-    if (currentConfig.onAgentSpeaking) {
-      currentConfig.onAgentSpeaking(true);
+    if (activeCall.config.onAgentSpeaking) {
+      activeCall.config.onAgentSpeaking(true);
     }
 
     // Store context for conversation flow
-    conversationContext.push(`User: ${userInput}`);
+    activeCall.conversationContext.push(`User: ${userInput}`);
     
-    // For now, we'll use a simple echo response
-    // In a real implementation, this would call an AI service
-    const response = generateSimpleResponse(userInput);
+    // Generate a response based on the user's input
+    // In a production environment, this would call an LLM API like OpenAI
+    const response = generateSimpleResponse(userInput, activeCall.conversationContext);
     
     // Store agent response in context
-    conversationContext.push(`Agent: ${response}`);
+    activeCall.conversationContext.push(`Agent: ${response}`);
     
     // Keep context window manageable
-    if (conversationContext.length > 10) {
-      conversationContext = conversationContext.slice(-10);
+    if (activeCall.conversationContext.length > 10) {
+      activeCall.conversationContext = activeCall.conversationContext.slice(-10);
     }
     
-    await sendAgentResponse(response);
+    await sendAgentResponse(callId, response);
 
   } catch (error) {
     console.error('Error processing user input:', error);
-    if (currentConfig.onError) {
-      currentConfig.onError(error as Error);
+    if (activeCall.config.onError) {
+      activeCall.config.onError(error as Error);
     }
   } finally {
-    isAgentProcessing = false;
-    if (currentConfig.onAgentSpeaking) {
-      currentConfig.onAgentSpeaking(false);
+    if (activeCall) {
+      activeCall.isAgentProcessing = false;
+      if (activeCall.config.onAgentSpeaking) {
+        activeCall.config.onAgentSpeaking(false);
+      }
     }
   }
 };
 
-// Simple response generator (placeholder for AI service)
-const generateSimpleResponse = (userInput: string): string => {
+// Enhanced response generator with context awareness
+const generateSimpleResponse = (userInput: string, context: string[]): string => {
   const lowercaseInput = userInput.toLowerCase();
   
+  // Check if this is a follow-up question
+  const isFollowUp = context.length > 2;
+  
+  // Basic greeting detection
   if (lowercaseInput.includes('hello') || lowercaseInput.includes('hi')) {
-    return "Hello! How can I assist you today?";
-  } else if (lowercaseInput.includes('bye') || lowercaseInput.includes('goodbye')) {
-    return "Goodbye! Have a great day!";
-  } else if (lowercaseInput.includes('thank')) {
+    return isFollowUp 
+      ? "Hello again! How can I continue to assist you?" 
+      : "Hello! How can I assist you today?";
+  } 
+  // Farewell detection
+  else if (lowercaseInput.includes('bye') || lowercaseInput.includes('goodbye')) {
+    return "Goodbye! Have a great day! Feel free to call again if you need assistance.";
+  } 
+  // Gratitude detection
+  else if (lowercaseInput.includes('thank')) {
     return "You're welcome! Is there anything else I can help you with?";
-  } else if (lowercaseInput.includes('help')) {
-    return "I'm here to help! What would you like to know?";
-  } else {
-    return `I understand you said: "${userInput}". How can I help you with that?`;
+  }
+  // Help request
+  else if (lowercaseInput.includes('help')) {
+    return "I'm here to help! What would you like to know? I can provide information, answer questions, or assist with various tasks.";
+  }
+  // Time/date related
+  else if (lowercaseInput.includes('time') || lowercaseInput.includes('date')) {
+    const now = new Date();
+    return `It's currently ${now.toLocaleTimeString()} on ${now.toLocaleDateString()}.`;
+  }
+  // Name inquiry
+  else if (lowercaseInput.includes('your name') || lowercaseInput.includes('who are you')) {
+    return "I'm your AI voice assistant, designed to help you with information and tasks. You can think of me as your helpful digital companion.";
+  }
+  // Default response with context awareness
+  else {
+    if (isFollowUp) {
+      return `Regarding your question about "${userInput}", I'd be happy to help with that. Could you provide more details so I can assist you better?`;
+    } else {
+      return `I understand you said: "${userInput}". How can I help you with that?`;
+    }
   }
 };
 
 export default {
   startCall,
   endCall,
-  sendAgentResponse,
   toggleMute,
   isCallInProgress,
-  getLatestTranscript
+  getActiveCalls,
+  getCallStatistics
 };

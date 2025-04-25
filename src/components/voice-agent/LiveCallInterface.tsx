@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Phone, Mic, MicOff, User, Bot } from "lucide-react";
+import { Phone, Mic, MicOff, User, Bot, UserPlus, Users } from "lucide-react";
 import EnhancedAudioVisualizer from './EnhancedAudioVisualizer';
 import VoiceSelector from './VoiceSelector';
 import { hasRequiredKeys } from '@/services/configService';
@@ -10,34 +11,76 @@ import * as callControllerService from '@/services/callControllerService';
 import { UID } from 'agora-rtc-sdk-ng';
 import ConversationStatus from './ConversationStatus';
 
-interface LiveCallInterfaceProps {
-  onCallStatusChange?: (isActive: boolean) => void;
+interface Message {
+  role: 'user' | 'agent';
+  text: string;
+  timestamp: Date;
 }
 
-const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
+interface LiveCallInterfaceProps {
+  onCallStatusChange?: (isActive: boolean) => void;
+  agentName?: string;
+}
+
+const LiveCallInterface = ({ 
+  onCallStatusChange, 
+  agentName = 'AI Assistant' 
+}: LiveCallInterfaceProps) => {
   // Call state
   const [isCallActive, setIsCallActive] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const [selectedVoiceId, setSelectedVoiceId] = useState('CwhRBWXzGAHq8TQ4Fs17'); // Default to Roger
   const [isMuted, setIsMuted] = useState(false);
   const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
+  const [callId, setCallId] = useState('');
+  const [callDuration, setCallDuration] = useState(0);
+  const [callDurationDisplay, setCallDurationDisplay] = useState('00:00');
   
   // Transcript state
   const [transcript, setTranscript] = useState('');
-  const [conversationHistory, setConversationHistory] = useState<Array<{
-    role: 'user' | 'agent';
-    text: string;
-    timestamp: Date;
-  }>>([]);
+  const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
+  const [lastResponse, setLastResponse] = useState('');
   
   // Audio visualization data
   const [audioVolumes, setAudioVolumes] = useState<{uid: UID, level: number}[]>([]);
   
   // Check if the necessary API keys are configured
   const areApiKeysConfigured = hasRequiredKeys('agora') && hasRequiredKeys('elevenLabs') && hasRequiredKeys('deepgram');
+
+  // Generate a unique call ID
+  const generateCallId = () => {
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 8);
+    return `call-${timestamp}-${random}`;
+  };
   
-  // Add new state for last response
-  const [lastResponse, setLastResponse] = useState<string>('');
+  // Format seconds to MM:SS display
+  const formatCallDuration = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
+  // Update call duration timer
+  useEffect(() => {
+    let intervalId: number;
+    
+    if (isCallActive) {
+      intervalId = window.setInterval(() => {
+        setCallDuration(prev => {
+          const newDuration = prev + 1;
+          setCallDurationDisplay(formatCallDuration(newDuration));
+          return newDuration;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isCallActive]);
   
   // Handle starting a call
   const handleStartCall = async () => {
@@ -51,24 +94,21 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
     setIsInitializing(true);
     
     try {
+      // Generate a unique call ID for this session
+      const newCallId = generateCallId();
+      setCallId(newCallId);
+      
       const success = await callControllerService.startCall({
-        channelName: `lovele-ai-call-${Date.now()}`,
+        channelName: `lovele-ai-call-${newCallId}`,
         voiceId: selectedVoiceId,
         onCallConnected: () => {
           setIsCallActive(true);
+          setCallDuration(0);
+          setCallDurationDisplay('00:00');
+          
           if (onCallStatusChange) {
             onCallStatusChange(true);
           }
-          
-          // Add system message to conversation history
-          setConversationHistory(prev => [
-            ...prev, 
-            {
-              role: 'agent',
-              text: "Hello, I'm your AI assistant. How can I help you today?",
-              timestamp: new Date()
-            }
-          ]);
         },
         onCallEnded: () => {
           setIsCallActive(false);
@@ -81,31 +121,14 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
           
           if (isFinal && text.trim()) {
             // Add user message to conversation history
-            setConversationHistory(prev => [
-              ...prev, 
-              {
-                role: 'user',
-                text,
-                timestamp: new Date()
-              }
-            ]);
+            const newMessage: Message = {
+              role: 'user',
+              text,
+              timestamp: new Date()
+            };
             
-            // In a real app, this would trigger an API call to get the AI response
-            // For now, we'll use a simple echo response after a delay
-            setTimeout(() => {
-              const agentResponse = `I heard you say: "${text}"`;
-              callControllerService.sendAgentResponse(agentResponse);
-              
-              // Add agent response to conversation history
-              setConversationHistory(prev => [
-                ...prev, 
-                {
-                  role: 'agent',
-                  text: agentResponse,
-                  timestamp: new Date()
-                }
-              ]);
-            }, 1000);
+            setConversationHistory(prev => [...prev, newMessage]);
+            setTranscript('');
           }
         },
         onAgentSpeaking: (speaking) => {
@@ -117,6 +140,18 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
         },
         onAudioVolume: (volumes) => {
           setAudioVolumes(volumes);
+        },
+        onAgentResponse: (response) => {
+          setLastResponse(response);
+          
+          // Add agent's response to conversation history
+          const newMessage: Message = {
+            role: 'agent',
+            text: response,
+            timestamp: new Date()
+          };
+          
+          setConversationHistory(prev => [...prev, newMessage]);
         }
       });
       
@@ -172,9 +207,18 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
   return (
     <Card className="bg-black/40 backdrop-blur-xl border border-white/10 overflow-hidden">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <Phone className="h-5 w-5 text-violet-400" />
-          Voice Call
+        <CardTitle className="flex items-center justify-between gap-2 text-white">
+          <div className="flex items-center gap-2">
+            <Phone className="h-5 w-5 text-violet-400" />
+            <span>Voice Call</span>
+          </div>
+          
+          {isCallActive && (
+            <div className="flex items-center gap-2 text-sm font-normal">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-gray-300">Active • {callDurationDisplay}</span>
+            </div>
+          )}
         </CardTitle>
       </CardHeader>
       
@@ -207,8 +251,8 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-white font-medium">Active Call</span>
+                <Users className="h-5 w-5 text-violet-400" />
+                <span className="text-white font-medium">{agentName}</span>
               </div>
               
               <div className="flex gap-2">
@@ -254,7 +298,7 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
                 />
                 <div className="flex items-center mt-2 mb-1">
                   <Bot className="h-4 w-4 text-violet-400 mr-2" />
-                  <span className="text-sm text-white">AI Assistant</span>
+                  <span className="text-sm text-white">{agentName}</span>
                 </div>
               </div>
             </div>
@@ -272,24 +316,8 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
                   isAgentSpeaking={isAgentSpeaking}
                   transcript={transcript}
                   lastResponse={lastResponse}
+                  conversationHistory={conversationHistory}
                 />
-                
-                {conversationHistory.map((message, index) => (
-                  <div 
-                    key={index}
-                    className={`mt-3 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-                  >
-                    <div 
-                      className={`inline-block rounded-lg px-3 py-2 max-w-[80%] ${
-                        message.role === 'user' 
-                          ? 'bg-violet-600/30 text-white'
-                          : 'bg-white/10 text-gray-200'
-                      }`}
-                    >
-                      {message.text}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
