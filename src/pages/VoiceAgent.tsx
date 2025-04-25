@@ -1,12 +1,13 @@
+
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
-  Phone, Bot, MessageCircle, Mic, 
+  Phone, Bot, Mic, 
   Calendar, TrendingUp, Clock, Activity,
   Search, Bell, Shield, User, Settings,
-  Database, LogOut
+  Database, MessageCircle, Sparkles, Link
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import ActiveCallCard from "@/components/voice-agent/ActiveCallCard";
@@ -25,14 +27,23 @@ import CallStatsPanel from "@/components/voice-agent/CallStatsPanel";
 import RecentTranscriptsPanel from "@/components/voice-agent/RecentTranscriptsPanel";
 import ApiKeysForm from "@/components/voice-agent/ApiKeysForm";
 import VoiceTester from "@/components/voice-agent/VoiceTester";
+import VoiceSearch from "@/components/voice-agent/VoiceSearch";
 import LiveCallInterface from "@/components/voice-agent/LiveCallInterface";
+import KnowledgeBaseSettings from "@/components/voice-agent/KnowledgeBaseSettings";
+import LLMSelector from "@/components/voice-agent/LLMSelector";
+import SystemPromptEditor from "@/components/voice-agent/SystemPromptEditor";
+import WebhookSetup from "@/components/voice-agent/WebhookSetup";
 import { hasRequiredKeys } from "@/services/configService";
 
 const VoiceAgent = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentSettingsTab, setCurrentSettingsTab] = useState('api-keys');
   const [isCallActive, setIsCallActive] = useState(false);
+  const [selectedLLM, setSelectedLLM] = useState('gpt-4o');
+  const [activeKnowledgeBase, setActiveKnowledgeBase] = useState<string | null>(null);
+  const [systemPrompt, setSystemPrompt] = useState<string | undefined>();
   const [configComplete, setConfigComplete] = useState({
     agora: false,
     deepgram: false,
@@ -47,15 +58,28 @@ const VoiceAgent = () => {
       elevenLabs: hasRequiredKeys('elevenLabs'),
       openAI: hasRequiredKeys('openAI')
     });
-  }, [currentPage]);
+  }, [currentPage, currentSettingsTab]);
 
   const handleCallStatusChange = (isActive: boolean) => {
     setIsCallActive(isActive);
   };
 
+  const handleLLMChange = (modelId: string) => {
+    setSelectedLLM(modelId);
+    toast.success(`Model changed to ${modelId}`);
+  };
+
+  const handleKnowledgeBaseChange = (knowledgeBase: string | null) => {
+    setActiveKnowledgeBase(knowledgeBase);
+  };
+
+  const handleSystemPromptChange = (prompt: string) => {
+    setSystemPrompt(prompt);
+  };
+
   const renderDashboardContent = () => (
     <div className="space-y-8">
-      {(!configComplete.agora || !configComplete.elevenLabs) && (
+      {(!configComplete.agora || !configComplete.elevenLabs || !configComplete.deepgram) && (
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
             <Shield className="h-5 w-5 text-amber-400 mt-0.5" />
@@ -66,7 +90,10 @@ const VoiceAgent = () => {
                 <Button 
                   variant="link" 
                   className="text-amber-400 p-0 h-auto text-xs font-medium"
-                  onClick={() => setCurrentPage('settings')}
+                  onClick={() => {
+                    setCurrentPage('settings');
+                    setCurrentSettingsTab('api-keys');
+                  }}
                 >
                   {" "}Settings page
                 </Button>{" "}
@@ -114,7 +141,7 @@ const VoiceAgent = () => {
                 <ActiveCallCard 
                   callId="CS-12345"
                   duration="02:45"
-                  agentName="Customer Service Bot"
+                  agentName="College Assistant"
                   onEndCall={() => setIsCallActive(false)}
                 />
                 <div className="p-4 bg-white/5 rounded-lg">
@@ -122,7 +149,10 @@ const VoiceAgent = () => {
                 </div>
               </div>
             ) : (
-              <LiveCallInterface onCallStatusChange={handleCallStatusChange} />
+              <LiveCallInterface 
+                onCallStatusChange={handleCallStatusChange} 
+                agentName="College Assistant"
+              />
             )}
           </div>
         </div>
@@ -158,40 +188,51 @@ const VoiceAgent = () => {
 
   const renderSettingsContent = () => (
     <div className="space-y-6">
-      <ApiKeysForm />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <VoiceTester />
+      <Tabs 
+        value={currentSettingsTab} 
+        onValueChange={setCurrentSettingsTab} 
+        className="w-full"
+      >
+        <TabsList className="grid grid-cols-5 bg-black/40 border border-white/10">
+          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
+          <TabsTrigger value="voices">Voices</TabsTrigger>
+          <TabsTrigger value="models">Models</TabsTrigger>
+          <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+          <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+        </TabsList>
         
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Agent Configuration</h2>
-          
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-md font-medium text-white">Agent Behavior</h3>
-              <div className="p-4 bg-white/5 rounded-lg">
-                <p className="text-gray-400 mb-2">Response Style</p>
-                <select className="w-full bg-white/10 border border-white/20 rounded p-2 text-white">
-                  <option>Professional</option>
-                  <option>Friendly</option>
-                  <option>Concise</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-md font-medium text-white">System Prompt</h3>
-              <div className="p-4 bg-white/5 rounded-lg">
-                <textarea 
-                  className="w-full bg-white/10 border border-white/20 rounded p-2 text-white h-32"
-                  placeholder="Enter the system prompt that defines how your AI agent behaves..."
-                  defaultValue="You are a helpful customer service representative for Lovele.ai. You are speaking with a customer who has questions about our voice AI platform. Be concise, friendly, and helpful."
-                ></textarea>
-              </div>
-            </div>
+        <TabsContent value="api-keys" className="space-y-6 mt-6">
+          <ApiKeysForm />
+          <VoiceTester />
+        </TabsContent>
+        
+        <TabsContent value="voices" className="space-y-6 mt-6">
+          <VoiceSearch />
+        </TabsContent>
+        
+        <TabsContent value="models" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LLMSelector 
+              selectedModel={selectedLLM} 
+              onSelectModel={handleLLMChange} 
+            />
+            <SystemPromptEditor 
+              initialPrompt={systemPrompt}
+              onSavePrompt={handleSystemPromptChange}
+            />
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="knowledge" className="space-y-6 mt-6">
+          <KnowledgeBaseSettings 
+            onKnowledgeBaseChange={handleKnowledgeBaseChange} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="webhooks" className="space-y-6 mt-6">
+          <WebhookSetup />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 
@@ -235,6 +276,54 @@ const VoiceAgent = () => {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Button>
+              
+              <div className="pt-4 mt-4 border-t border-violet-500/10">
+                <h3 className="text-xs uppercase text-gray-500 font-medium mb-2 px-3">Features</h3>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
+                  onClick={() => {
+                    setCurrentPage('settings');
+                    setCurrentSettingsTab('knowledge');
+                  }}
+                >
+                  <Database className="mr-2 h-4 w-4" />
+                  Knowledge Base
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
+                  onClick={() => {
+                    setCurrentPage('settings');
+                    setCurrentSettingsTab('models');
+                  }}
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  LLM Models
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
+                  onClick={() => {
+                    setCurrentPage('settings');
+                    setCurrentSettingsTab('voices');
+                  }}
+                >
+                  <Mic className="mr-2 h-4 w-4" />
+                  Voice Library
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
+                  onClick={() => {
+                    setCurrentPage('settings');
+                    setCurrentSettingsTab('webhooks');
+                  }}
+                >
+                  <Link className="mr-2 h-4 w-4" />
+                  Webhooks
+                </Button>
+              </div>
             </nav>
           </div>
         </div>

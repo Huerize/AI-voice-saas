@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Phone, Mic, MicOff, User, Bot, UserPlus, Users } from "lucide-react";
+import { Phone, Mic, MicOff, User, Bot, Database, Sparkles } from "lucide-react";
 import EnhancedAudioVisualizer from './EnhancedAudioVisualizer';
 import VoiceSelector from './VoiceSelector';
 import { hasRequiredKeys } from '@/services/configService';
@@ -15,16 +15,30 @@ interface Message {
   role: 'user' | 'agent';
   text: string;
   timestamp: Date;
+  topic?: string;
+  isEducational?: boolean;
+  knowledgeSource?: string;
+  confidence?: number;
 }
 
 interface LiveCallInterfaceProps {
   onCallStatusChange?: (isActive: boolean) => void;
   agentName?: string;
+  selectedLLM?: string;
+  knowledgeBase?: string;
+  collegeContext?: string;
+  courseName?: string;
+  systemPrompt?: string;
 }
 
 const LiveCallInterface = ({ 
   onCallStatusChange, 
-  agentName = 'AI Assistant' 
+  agentName = 'College Assistant',
+  selectedLLM,
+  knowledgeBase,
+  collegeContext = 'General College',
+  courseName,
+  systemPrompt
 }: LiveCallInterfaceProps) => {
   // Call state
   const [isCallActive, setIsCallActive] = useState(false);
@@ -98,9 +112,15 @@ const LiveCallInterface = ({
       const newCallId = generateCallId();
       setCallId(newCallId);
       
-      const success = await callControllerService.startCall({
-        channelName: `lovele-ai-call-${newCallId}`,
+      // Create the call configuration, including knowledge base and LLM settings
+      const callConfig = {
+        channelName: `college-ai-call-${newCallId}`,
         voiceId: selectedVoiceId,
+        llmModel: selectedLLM,
+        knowledgeBase: knowledgeBase,
+        systemPrompt: systemPrompt,
+        collegeContext: collegeContext,
+        courseName: courseName,
         onCallConnected: () => {
           setIsCallActive(true);
           setCallDuration(0);
@@ -141,19 +161,25 @@ const LiveCallInterface = ({
         onAudioVolume: (volumes) => {
           setAudioVolumes(volumes);
         },
-        onAgentResponse: (response) => {
+        onAgentResponse: (response, metadata) => {
           setLastResponse(response);
           
-          // Add agent's response to conversation history
+          // Add agent's response to conversation history with any knowledge source metadata
           const newMessage: Message = {
             role: 'agent',
             text: response,
-            timestamp: new Date()
+            timestamp: new Date(),
+            topic: metadata?.topic,
+            isEducational: metadata?.isEducational,
+            knowledgeSource: metadata?.knowledgeSource,
+            confidence: metadata?.confidence
           };
           
           setConversationHistory(prev => [...prev, newMessage]);
         }
-      });
+      };
+      
+      const success = await callControllerService.startCall(callConfig);
       
       if (!success) {
         toast.error("Failed to start call");
@@ -246,12 +272,29 @@ const LiveCallInterface = ({
                 </p>
               </div>
             )}
+            
+            {(selectedLLM || knowledgeBase) && (
+              <div className="flex items-center justify-between bg-black/30 rounded-lg p-3">
+                {selectedLLM && (
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <span className="text-xs text-amber-300">{selectedLLM}</span>
+                  </div>
+                )}
+                {knowledgeBase && (
+                  <div className="flex items-center gap-1">
+                    <Database className="h-4 w-4 text-emerald-400" />
+                    <span className="text-xs text-emerald-300">{knowledgeBase}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-violet-400" />
+                <Bot className="h-5 w-5 text-violet-400" />
                 <span className="text-white font-medium">{agentName}</span>
               </div>
               
@@ -317,6 +360,10 @@ const LiveCallInterface = ({
                   transcript={transcript}
                   lastResponse={lastResponse}
                   conversationHistory={conversationHistory}
+                  collegeContext={collegeContext}
+                  courseName={courseName}
+                  currentLLM={selectedLLM}
+                  knowledgeBase={knowledgeBase}
                 />
               </div>
             </div>

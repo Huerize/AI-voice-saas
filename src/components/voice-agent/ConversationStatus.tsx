@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Bot, User, Clock, Book, GraduationCap } from 'lucide-react';
+import { Bot, User, Clock, Book, GraduationCap, Database, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'agent';
@@ -8,6 +8,8 @@ interface Message {
   timestamp: Date;
   topic?: string;
   isEducational?: boolean;
+  knowledgeSource?: string; // Source of knowledge for this response
+  confidence?: number; // Confidence score for knowledge retrieval
 }
 
 interface ConversationStatusProps {
@@ -17,6 +19,8 @@ interface ConversationStatusProps {
   conversationHistory?: Message[];
   collegeContext?: string;
   courseName?: string;
+  currentLLM?: string; // Currently selected LLM model
+  knowledgeBase?: string; // Currently active knowledge base
 }
 
 const ConversationStatus = ({ 
@@ -25,7 +29,9 @@ const ConversationStatus = ({
   lastResponse, 
   conversationHistory = [],
   collegeContext = 'General',
-  courseName
+  courseName,
+  currentLLM,
+  knowledgeBase
 }: ConversationStatusProps) => {
   // Format the timestamp to a readable time string
   const formatTime = (date: Date): string => {
@@ -43,15 +49,32 @@ const ConversationStatus = ({
 
   return (
     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-      {/* College context header */}
-      {collegeContext && (
-        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-700/50">
+      {/* Header showing context and model info */}
+      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-700/50">
+        <div className="flex items-center gap-2">
           <GraduationCap className="h-4 w-4 text-violet-400" />
           <p className="text-sm text-violet-300 font-medium">
             {collegeContext} {courseName ? `• ${courseName}` : ''}
           </p>
         </div>
-      )}
+        
+        {(currentLLM || knowledgeBase) && (
+          <div className="flex items-center gap-2">
+            {currentLLM && (
+              <div className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-amber-400" />
+                <p className="text-xs text-amber-300">{currentLLM}</p>
+              </div>
+            )}
+            {knowledgeBase && (
+              <div className="flex items-center gap-1">
+                <Database className="h-3 w-3 text-emerald-400" />
+                <p className="text-xs text-emerald-300">{knowledgeBase}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       
       {/* Current transcript (user speaking) */}
       {transcript && !isAgentSpeaking && (
@@ -105,6 +128,19 @@ const ConversationStatus = ({
                   </p>
                 </div>
                 <p className="text-sm text-white">{message.text}</p>
+                
+                {/* Knowledge source citation */}
+                {message.knowledgeSource && (
+                  <div className="mt-1 text-xs flex items-center">
+                    <Database className="h-3 w-3 text-emerald-400 mr-1" />
+                    <span className="text-emerald-300">Source: {message.knowledgeSource}</span>
+                    {message.confidence !== undefined && (
+                      <span className="ml-2 text-gray-400">
+                        Confidence: {Math.round(message.confidence * 100)}%
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
