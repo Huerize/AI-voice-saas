@@ -10,12 +10,24 @@ export interface CallControllerConfig {
   channelName: string;
   voiceId: string;
   
+  // Optional LLM and knowledge base configuration
+  llmModel?: string;
+  knowledgeBase?: string;
+  systemPrompt?: string;
+  collegeContext?: string;
+  courseName?: string;
+  
   // Event handlers
   onCallConnected?: () => void;
   onCallEnded?: () => void;
   onTranscriptReceived?: (transcript: string, isFinal: boolean) => void;
   onAgentSpeaking?: (isSpeaking: boolean) => void;
-  onAgentResponse?: (response: string) => void;
+  onAgentResponse?: (response: string, metadata?: {
+    topic?: string;
+    isEducational?: boolean;
+    knowledgeSource?: string;
+    confidence?: number;
+  }) => void;
   onError?: (error: Error) => void;
   onAudioVolume?: (volumes: {uid: UID, level: number}[]) => void;
 }
@@ -185,8 +197,16 @@ const sendAgentResponse = async (callId: string, text: string): Promise<boolean>
       activeCall.config.onAgentSpeaking(true);
     }
     
+    // Create metadata for educational content
+    const metadata = {
+      topic: detectTopic(text),
+      isEducational: isEducationalContent(text),
+      knowledgeSource: activeCall.config.knowledgeBase || undefined,
+      confidence: Math.random() * 0.3 + 0.7 // Simulate confidence between 0.7-1.0
+    };
+    
     if (activeCall.config.onAgentResponse) {
-      activeCall.config.onAgentResponse(text);
+      activeCall.config.onAgentResponse(text, metadata);
     }
     
     // Temporarily pause STT while agent is speaking
@@ -223,6 +243,42 @@ const sendAgentResponse = async (callId: string, text: string): Promise<boolean>
     
     return false;
   }
+};
+
+// Helper function to detect educational topic in text
+const detectTopic = (text: string): string | undefined => {
+  const topics = [
+    { keyword: 'admission', topic: 'Admissions' },
+    { keyword: 'tuition', topic: 'Finances' },
+    { keyword: 'scholarship', topic: 'Scholarships' },
+    { keyword: 'course', topic: 'Courses' },
+    { keyword: 'degree', topic: 'Degrees' },
+    { keyword: 'major', topic: 'Majors' },
+    { keyword: 'semester', topic: 'Academic Calendar' },
+    { keyword: 'housing', topic: 'Student Housing' },
+    { keyword: 'campus', topic: 'Campus Life' }
+  ];
+  
+  const lowerText = text.toLowerCase();
+  for (const { keyword, topic } of topics) {
+    if (lowerText.includes(keyword)) {
+      return topic;
+    }
+  }
+  
+  return undefined;
+};
+
+// Helper function to check if content is educational
+const isEducationalContent = (text: string): boolean => {
+  const educationalIndicators = [
+    'learn', 'study', 'course', 'class', 'degree', 
+    'program', 'education', 'college', 'student',
+    'professor', 'academic', 'university', 'research'
+  ];
+  
+  const lowerText = text.toLowerCase();
+  return educationalIndicators.some(indicator => lowerText.includes(indicator));
 };
 
 // Mute/unmute the user's microphone
