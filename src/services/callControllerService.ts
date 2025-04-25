@@ -1,8 +1,8 @@
-
 import { toast } from 'sonner';
 import * as agoraService from './agoraService';
 import * as sttService from './sttService';
 import * as ttsService from './ttsService';
+import { UID } from 'agora-rtc-sdk-ng';
 
 // Types
 export interface CallControllerConfig {
@@ -16,7 +16,7 @@ export interface CallControllerConfig {
   onTranscriptReceived?: (transcript: string, isFinal: boolean) => void;
   onAgentSpeaking?: (isSpeaking: boolean) => void;
   onError?: (error: Error) => void;
-  onAudioVolume?: (volumes: {uid: number, level: number}[]) => void;
+  onAudioVolume?: (volumes: {uid: UID, level: number}[]) => void;
 }
 
 // Call controller state

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import EnhancedAudioVisualizer from './EnhancedAudioVisualizer';
 import VoiceSelector from './VoiceSelector';
 import { hasRequiredKeys } from '@/services/configService';
 import * as callControllerService from '@/services/callControllerService';
+import { UID } from 'agora-rtc-sdk-ng';
 
 interface LiveCallInterfaceProps {
   onCallStatusChange?: (isActive: boolean) => void;
@@ -30,7 +30,7 @@ const LiveCallInterface = ({ onCallStatusChange }: LiveCallInterfaceProps) => {
   }>>([]);
   
   // Audio visualization data
-  const [audioVolumes, setAudioVolumes] = useState<{uid: number, level: number}[]>([]);
+  const [audioVolumes, setAudioVolumes] = useState<{uid: UID, level: number}[]>([]);
   
   // Check if the necessary API keys are configured
   const areApiKeysConfigured = hasRequiredKeys('agora') && hasRequiredKeys('elevenLabs') && hasRequiredKeys('deepgram');

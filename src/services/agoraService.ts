@@ -1,9 +1,9 @@
-
 import AgoraRTC, {
   IAgoraRTCClient,
   IAgoraRTCRemoteUser,
   IMicrophoneAudioTrack,
-  IRemoteAudioTrack
+  IRemoteAudioTrack,
+  UID
 } from 'agora-rtc-sdk-ng';
 import { toast } from 'sonner';
 import { getApiKeys } from './configService';
@@ -15,7 +15,7 @@ interface CallConfig {
   role?: 'host' | 'audience';
   onUserJoined?: (user: IAgoraRTCRemoteUser) => void;
   onUserLeft?: (user: IAgoraRTCRemoteUser) => void;
-  onAudioVolumeIndication?: (volumes: {uid: number, level: number}[]) => void;
+  onAudioVolumeIndication?: (volumes: {uid: UID, level: number}[]) => void;
 }
 
 type AgoraCallStatus = 'idle' | 'initializing' | 'connected' | 'error';
