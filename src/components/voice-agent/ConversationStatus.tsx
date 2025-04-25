@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Bot, User, Clock, MessageCircle, Book, GraduationCap } from 'lucide-react';
+import { Bot, User, Clock, Book, GraduationCap } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'agent';
