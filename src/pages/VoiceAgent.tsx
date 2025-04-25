@@ -1,4 +1,3 @@
-
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -24,14 +23,40 @@ import AudioVisualizer from "@/components/voice-agent/AudioVisualizer";
 import AgentStatusPanel from "@/components/voice-agent/AgentStatusPanel";
 import CallStatsPanel from "@/components/voice-agent/CallStatsPanel";
 import RecentTranscriptsPanel from "@/components/voice-agent/RecentTranscriptsPanel";
+import ApiKeysForm from "@/components/voice-agent/ApiKeysForm";
+import VoiceTester from "@/components/voice-agent/VoiceTester";
+import { hasRequiredKeys } from "@/services/configService";
 
 const VoiceAgent = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isCallActive, setIsCallActive] = useState(false);
+  const [configComplete, setConfigComplete] = useState({
+    agora: false,
+    deepgram: false,
+    elevenLabs: false,
+    openAI: false
+  });
+
+  useEffect(() => {
+    setConfigComplete({
+      agora: hasRequiredKeys('agora'),
+      deepgram: hasRequiredKeys('deepgram'),
+      elevenLabs: hasRequiredKeys('elevenLabs'),
+      openAI: hasRequiredKeys('openAI')
+    });
+  }, [currentPage]);
 
   const handleMakeCall = () => {
+    if (!configComplete.agora || !configComplete.elevenLabs) {
+      toast.error("Missing required API keys", {
+        description: "Please configure Agora and ElevenLabs API keys in Settings"
+      });
+      setCurrentPage('settings');
+      return;
+    }
+
     setIsCallActive(true);
     toast.success("Call initiated successfully");
   };
@@ -43,7 +68,28 @@ const VoiceAgent = () => {
 
   const renderDashboardContent = () => (
     <div className="space-y-8">
-      {/* Top Stats */}
+      {(!configComplete.agora || !configComplete.elevenLabs) && (
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-amber-400 mt-0.5" />
+            <div>
+              <p className="text-sm text-amber-200 font-medium">API Configuration Required</p>
+              <p className="text-xs text-amber-200/80 mt-1">
+                Some required API keys are missing. Please visit the 
+                <Button 
+                  variant="link" 
+                  className="text-amber-400 p-0 h-auto text-xs font-medium"
+                  onClick={() => setCurrentPage('settings')}
+                >
+                  {" "}Settings page
+                </Button>{" "}
+                to complete configuration.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <CallStatsPanel 
           title="Total Calls" 
@@ -67,13 +113,12 @@ const VoiceAgent = () => {
           title="Success Rate" 
           value="95%" 
           description="Avg. completion" 
-          icon={Activity} 
+          icon={Activity}
+          variant="success"
         />
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Calls */}
         <div className="lg:col-span-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
           <h2 className="text-xl font-semibold text-white mb-6">Live Calls</h2>
           <div className="space-y-4">
@@ -104,14 +149,12 @@ const VoiceAgent = () => {
           </div>
         </div>
 
-        {/* Agent Status */}
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
           <h2 className="text-xl font-semibold text-white mb-6">Agent Status</h2>
           <AgentStatusPanel />
         </div>
       </div>
 
-      {/* Transcripts */}
       <RecentTranscriptsPanel />
     </div>
   );
@@ -137,39 +180,35 @@ const VoiceAgent = () => {
 
   const renderSettingsContent = () => (
     <div className="space-y-6">
-      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-        <h2 className="text-xl font-semibold text-white mb-6">Voice Agent Settings</h2>
+      <ApiKeysForm />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <VoiceTester />
         
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-md font-medium text-white">Agent Configuration</h3>
-            <div className="p-4 bg-white/5 rounded-lg">
-              <p className="text-gray-400 mb-2">Select TTS Voice</p>
-              <select className="w-full bg-white/10 border border-white/20 rounded p-2 text-white">
-                <option>Roger (Male)</option>
-                <option>Sarah (Female)</option>
-                <option>Charlie (Male)</option>
-              </select>
-            </div>
-          </div>
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-white mb-6">Agent Configuration</h2>
           
-          <div className="space-y-2">
-            <h3 className="text-md font-medium text-white">Audio Settings</h3>
-            <div className="p-4 bg-white/5 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-400">Audio Quality</span>
-                <span className="text-white">High</span>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-md font-medium text-white">Agent Behavior</h3>
+              <div className="p-4 bg-white/5 rounded-lg">
+                <p className="text-gray-400 mb-2">Response Style</p>
+                <select className="w-full bg-white/10 border border-white/20 rounded p-2 text-white">
+                  <option>Professional</option>
+                  <option>Friendly</option>
+                  <option>Concise</option>
+                </select>
               </div>
-              <input type="range" className="w-full" min="0" max="2" step="1" defaultValue="2" />
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-md font-medium text-white">API Integration</h3>
-            <div className="p-4 bg-white/5 rounded-lg">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">ElevenLabs API Key</span>
-                <Button size="sm" variant="outline">Configure</Button>
+            
+            <div className="space-y-2">
+              <h3 className="text-md font-medium text-white">System Prompt</h3>
+              <div className="p-4 bg-white/5 rounded-lg">
+                <textarea 
+                  className="w-full bg-white/10 border border-white/20 rounded p-2 text-white h-32"
+                  placeholder="Enter the system prompt that defines how your AI agent behaves..."
+                  defaultValue="You are a helpful customer service representative for Lovele.ai. You are speaking with a customer who has questions about our voice AI platform. Be concise, friendly, and helpful."
+                ></textarea>
               </div>
             </div>
           </div>
@@ -181,7 +220,6 @@ const VoiceAgent = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0B]">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
         <div className="w-64 md:w-72 lg:w-80 bg-violet-500/5 backdrop-blur-xl border-r border-violet-500/10 hidden md:block">
           <div className="p-6">
             <h1 className="text-xl font-bold text-white mb-8">LoveleAI</h1>
@@ -223,7 +261,6 @@ const VoiceAgent = () => {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 overflow-auto">
           <header className="bg-violet-500/5 border-b border-violet-500/10 backdrop-blur-xl sticky top-0 z-10">
             <div className="px-4 md:px-6 lg:px-8 py-4">

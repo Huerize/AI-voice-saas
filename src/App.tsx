@@ -10,9 +10,20 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import VoiceAgent from "./pages/VoiceAgent";
 
-const queryClient = new QueryClient();
+// Initialize QueryClient for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Clerk publishable key for authentication
 const CLERK_PUBLISHABLE_KEY = "pk_test_d29ya2luZy1ld2UtNDIuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
+// ProtectedRoute component to wrap authenticated routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, isLoaded } = useUser();
 
