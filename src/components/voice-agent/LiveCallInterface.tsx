@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +30,7 @@ interface LiveCallInterfaceProps {
   collegeContext?: string;
   courseName?: string;
   systemPrompt?: string;
+  selectedVoiceId?: string;
 }
 
 const LiveCallInterface = ({ 
@@ -40,7 +40,8 @@ const LiveCallInterface = ({
   knowledgeBase,
   collegeContext = 'General College',
   courseName,
-  systemPrompt
+  systemPrompt,
+  selectedVoiceId = 'CwhRBWXzGAHq8TQ4Fs17' // Default to Roger
 }: LiveCallInterfaceProps) => {
   // Voice Agent Settings
   const { settings, updateSettings } = useVoiceAgentSettings({
@@ -55,13 +56,20 @@ const LiveCallInterface = ({
   // Call state
   const [isCallActive, setIsCallActive] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
-  const [selectedVoiceId, setSelectedVoiceId] = useState('CwhRBWXzGAHq8TQ4Fs17'); // Default to Roger
+  const [selectedVoice, setSelectedVoice] = useState(selectedVoiceId);
   const [isMuted, setIsMuted] = useState(false);
   const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
   const [callId, setCallId] = useState('');
   const [callDuration, setCallDuration] = useState(0);
   const [callDurationDisplay, setCallDurationDisplay] = useState('00:00');
   const [showSettings, setShowSettings] = useState(false);
+  
+  // Update selectedVoice if the prop changes
+  useEffect(() => {
+    if (selectedVoiceId && selectedVoiceId !== selectedVoice) {
+      setSelectedVoice(selectedVoiceId);
+    }
+  }, [selectedVoiceId]);
   
   // Transcript state
   const [transcript, setTranscript] = useState('');
@@ -128,7 +136,7 @@ const LiveCallInterface = ({
       // Create the call configuration, including knowledge base and LLM settings
       const callConfig = {
         channelName: `college-ai-call-${newCallId}`,
-        voiceId: selectedVoiceId,
+        voiceId: selectedVoice,
         llmModel: settings.selectedLLM,
         knowledgeBase: settings.knowledgeBase,
         systemPrompt: settings.systemPrompt,
@@ -300,7 +308,7 @@ const LiveCallInterface = ({
 
             <div className="space-y-4">
               <label className="text-sm text-gray-300 block">Select Agent Voice</label>
-              <VoiceSelector selectedVoiceId={selectedVoiceId} onSelectVoice={setSelectedVoiceId} />
+              <VoiceSelector selectedVoiceId={selectedVoice} onSelectVoice={setSelectedVoice} />
             </div>
             
             <Button

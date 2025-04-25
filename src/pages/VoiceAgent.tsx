@@ -7,7 +7,8 @@ import {
   Phone, Bot, Mic, 
   Calendar, TrendingUp, Clock, Activity,
   Search, Bell, Shield, User, Settings,
-  Database, MessageCircle, Sparkles, Link, Sliders
+  Database, MessageCircle, Sparkles, Link, Sliders,
+  Headphones, Home
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -36,6 +37,7 @@ import WebhookSetup from "@/components/voice-agent/WebhookSetup";
 import { hasRequiredKeys } from "@/services/configService";
 import { useVoiceAgentSettings } from "@/hooks/useVoiceAgentSettings";
 import VoiceAgentSettings from "@/components/voice-agent/VoiceAgentSettings";
+import VoiceLibrary from "@/components/voice-agent/VoiceLibrary";
 
 const VoiceAgent = () => {
   const { user } = useUser();
@@ -49,6 +51,7 @@ const VoiceAgent = () => {
     elevenLabs: false,
     openAI: false
   });
+  const [selectedVoiceId, setSelectedVoiceId] = useState('CwhRBWXzGAHq8TQ4Fs17'); // Default to Roger
 
   // Use the voice agent settings hook
   const { settings, updateSettings } = useVoiceAgentSettings();
@@ -81,6 +84,11 @@ const VoiceAgent = () => {
 
   const handleVoiceAgentSettingChange = (setting: string, value: number) => {
     updateSettings({ [setting]: value });
+  };
+
+  const handleVoiceChange = (voiceId: string) => {
+    setSelectedVoiceId(voiceId);
+    toast.success("Voice updated successfully");
   };
 
   const renderDashboardContent = () => (
@@ -140,7 +148,7 @@ const VoiceAgent = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Live Calls</h2>
+          <h2 className="text-xl font-semibold text-white mb-6">Live Voice Agent</h2>
           <div className="space-y-4">
             {isCallActive ? (
               <div className="space-y-4">
@@ -209,6 +217,18 @@ const VoiceAgent = () => {
               <Sparkles className="h-4 w-4 mr-2" />
               Select LLM Model
             </Button>
+            
+            <Button 
+              variant="ghost" 
+              className="w-full text-violet-400 border border-violet-500/20"
+              onClick={() => {
+                setCurrentPage('settings');
+                setCurrentSettingsTab('voices');
+              }}
+            >
+              <Headphones className="h-4 w-4 mr-2" />
+              Voice Library
+            </Button>
           </div>
         </div>
       </div>
@@ -257,6 +277,7 @@ const VoiceAgent = () => {
         </TabsContent>
         
         <TabsContent value="voices" className="space-y-6 mt-6">
+          <VoiceLibrary onSelectVoice={handleVoiceChange} selectedVoiceId={selectedVoiceId} />
           <VoiceSearch />
         </TabsContent>
         
@@ -293,6 +314,15 @@ const VoiceAgent = () => {
           <div className="p-6">
             <h1 className="text-xl font-bold text-white mb-8">LoveleAI</h1>
             <nav className="space-y-2">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
+                onClick={() => navigate("/dashboard")}
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Main Dashboard
+              </Button>
+              
               <Button 
                 variant="ghost" 
                 className={cn(
@@ -413,7 +443,7 @@ const VoiceAgent = () => {
                           <span>Account Settings</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-violet-500/10" />
-                        <DropdownMenuItem onClick={() => navigate("/")} className="hover:bg-violet-500/10 cursor-pointer">
+                        <DropdownMenuItem onClick={() => navigate("/dashboard")} className="hover:bg-violet-500/10 cursor-pointer">
                           <User className="mr-2 h-4 w-4" />
                           <span>Back to Main Dashboard</span>
                         </DropdownMenuItem>
