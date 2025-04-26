@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ClerkProvider, SignIn, SignUp, useUser } from "@clerk/clerk-react";
-import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import VoiceAgent from "./pages/VoiceAgent";
@@ -46,7 +45,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/sign-in/*" element={<SignIn />} />
             <Route path="/sign-up/*" element={<SignUp />} />
             <Route 
@@ -58,7 +57,7 @@ const App = () => (
               } 
             />
             <Route 
-              path="/voice-agent" 
+              path="/voice-agent/*" 
               element={
                 <ProtectedRoute>
                   <VoiceAgent />
