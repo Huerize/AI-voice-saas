@@ -1,13 +1,11 @@
 
 import React from 'react';
-import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { hasRequiredKeys } from '@/services/configService';
 import { AlertTriangle, CheckCircle, Bot } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useUser();
   const navigate = useNavigate();
 
   const deepgramConfigured = hasRequiredKeys('deepgram');
@@ -18,8 +16,8 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-12">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Welcome, {user?.firstName}!</h1>
-            <p className="text-slate-300">Access your AI voice agent below</p>
+            <h1 className="text-4xl font-bold mb-2">Voice Agent Dashboard</h1>
+            <p className="text-slate-300">Configure and access your AI voice agent</p>
           </div>
           
           <Button onClick={() => navigate("/voice-agent")} className="bg-gradient-to-r from-violet-600 to-indigo-600 mt-4 md:mt-0">
