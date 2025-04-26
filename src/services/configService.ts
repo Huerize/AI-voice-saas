@@ -1,5 +1,3 @@
-
-// Configuration service for managing API keys and settings
 import { toast } from "sonner";
 
 export interface APIKeys {
@@ -26,8 +24,14 @@ export const getApiKeys = (): APIKeys => {
 // Save API keys to localStorage
 export const saveApiKeys = (keys: APIKeys): void => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
-    toast.success('API keys saved successfully');
+    // Merge with existing keys to preserve any previously saved keys
+    const existingKeys = getApiKeys();
+    const updatedKeys = { ...existingKeys, ...keys };
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedKeys));
+    toast.success('API keys saved successfully', {
+      description: 'Keys for Deepgram and ElevenLabs have been configured.'
+    });
   } catch (error) {
     console.error('Failed to save API keys:', error);
     toast.error('Failed to save API keys');
@@ -58,9 +62,18 @@ export const clearApiKeys = (): void => {
   toast.info('API keys cleared');
 };
 
+// Add a method to validate API keys
+export const validateApiKeys = (keys: APIKeys): boolean => {
+  return !!(
+    keys.deepgramApiKey && 
+    keys.elevenLabsApiKey
+  );
+};
+
 export default {
   getApiKeys,
   saveApiKeys,
   hasRequiredKeys,
-  clearApiKeys
+  clearApiKeys,
+  validateApiKeys
 };

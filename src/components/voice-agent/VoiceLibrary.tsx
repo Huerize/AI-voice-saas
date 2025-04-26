@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { availableVoices, Voice } from "@/services/ttsService";
-import { Headphones, Play, Check } from "lucide-react";
+import { Headphones, Play, Check, Settings } from "lucide-react";
 import * as ttsService from '@/services/ttsService';
 import { toast } from 'sonner';
+import { hasRequiredKeys } from '@/services/configService';
 
 interface VoiceLibraryProps {
   onSelectVoice?: (voiceId: string) => void;
@@ -19,9 +20,9 @@ const VoiceLibrary = ({ onSelectVoice, selectedVoiceId }: VoiceLibraryProps) => 
 
   useEffect(() => {
     // Check if the ElevenLabs API key is configured
-    const checkAPIKey = async () => {
-      const { elevenLabsApiKey } = await import('@/services/configService').then(m => m.getApiKeys());
-      setIsConfigured(!!elevenLabsApiKey);
+    const checkAPIKey = () => {
+      const configured = hasRequiredKeys('elevenLabs');
+      setIsConfigured(configured);
     };
     
     checkAPIKey();
@@ -29,14 +30,16 @@ const VoiceLibrary = ({ onSelectVoice, selectedVoiceId }: VoiceLibraryProps) => 
 
   const handlePlaySample = async (voice: Voice) => {
     if (!isConfigured) {
-      toast.error('ElevenLabs API key is not configured');
+      toast.error('ElevenLabs API key is not configured', {
+        description: 'Please configure your API key in Settings'
+      });
       return;
     }
 
     setPlayingVoice(voice.id);
     
     try {
-      const sampleText = `Hello, I'm ${voice.name}. I'm a ${voice.gender === 'male' ? 'male' : 'female'} voice assistant powered by ElevenLabs.`;
+      const sampleText = `Hello, I'm ${voice.name}. I'm a ${voice.gender === 'male' ? 'male' : 'female'} voice assistant.`;
       
       await ttsService.streamSpeech(sampleText, voice.id);
     } catch (error) {
@@ -57,9 +60,21 @@ const VoiceLibrary = ({ onSelectVoice, selectedVoiceId }: VoiceLibraryProps) => 
   return (
     <Card className="bg-black/40 backdrop-blur-xl border border-white/10">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <Headphones className="h-5 w-5 text-violet-400" />
-          Voice Library
+        <CardTitle className="flex items-center justify-between gap-2 text-white">
+          <div className="flex items-center gap-2">
+            <Headphones className="h-5 w-5 text-violet-400" />
+            Voice Library
+          </div>
+          {!isConfigured && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="text-amber-400 border-amber-400/50 hover:bg-amber-500/10"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Configure
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -122,3 +137,4 @@ const VoiceLibrary = ({ onSelectVoice, selectedVoiceId }: VoiceLibraryProps) => 
 };
 
 export default VoiceLibrary;
+
