@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +10,8 @@ const ApiKeysForm = () => {
   const [apiKeys, setApiKeys] = useState<APIKeys>({
     agoraAppId: '',
     agoraAppCertificate: '',
-    deepgramApiKey: '',
-    elevenLabsApiKey: '',
+    deepgramApiKey: 'bd742128fc06d983d13a737f2fae70285973fee3',
+    elevenLabsApiKey: 'sk_3a9fc296879eb50a5021de21d473f070fda205134bb3635a',
     openAIApiKey: ''
   });
 

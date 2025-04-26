@@ -1,4 +1,3 @@
-
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -169,6 +168,7 @@ const VoiceAgent = () => {
                 selectedLLM={settings.selectedLLM}
                 knowledgeBase={settings.knowledgeBase}
                 systemPrompt={settings.systemPrompt}
+                selectedVoiceId={selectedVoiceId}
               />
             )}
           </div>
